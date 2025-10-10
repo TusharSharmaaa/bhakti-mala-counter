@@ -1,112 +1,38 @@
-import { useState, useEffect } from "react";
 import CounterButton from "@/components/CounterButton";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, Sparkles } from "lucide-react";
+import { RotateCcw, Sparkles, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
-import { getItem, setItem } from "@/lib/storage";
+import { useCounter } from "@/hooks/useCounter";
+import { useProfile } from "@/hooks/useProfile";
+import { useAuth } from "@/contexts/AuthContext";
 import { useWakeLock } from "@/hooks/useWakeLock";
 
-interface JapData {
-  count: number;
-  todayCount: number;
-  streak: number;
-  lastDate: string;
-}
-
 const Home = () => {
-  const [count, setCount] = useState(0);
-  const [todayCount, setTodayCount] = useState(0);
-  const [streak, setStreak] = useState(0);
-  const [lastDate, setLastDate] = useState<string>("");
-  const [isLoaded, setIsLoaded] = useState(false);
+  const { user, signOut } = useAuth();
+  const { counter, loading: counterLoading, increment, reset } = useCounter();
+  const { profile } = useProfile();
+  const malas = Math.floor(counter.count / 108);
 
   // Keep screen awake during japa
   useWakeLock(true);
 
-  // Load data from IndexedDB/localStorage
-  useEffect(() => {
-    getItem<JapData>('radha-jap-data').then(data => {
-      if (data) {
-        setCount(data.count || 0);
-        setStreak(data.streak || 0);
-        setLastDate(data.lastDate || "");
-        
-        // Check if it's a new day
-        const today = new Date().toDateString();
-        if (data.lastDate === today) {
-          setTodayCount(data.todayCount || 0);
-        } else {
-          // New day - check streak
-          const yesterday = new Date();
-          yesterday.setDate(yesterday.getDate() - 1);
-          if (data.lastDate === yesterday.toDateString()) {
-            // Streak continues
-          } else if (data.lastDate) {
-            // Streak broken
-            setStreak(0);
-          }
-          setTodayCount(0);
-        }
-      }
-      setIsLoaded(true);
-    }).catch(() => {
-      setIsLoaded(true);
-    });
-  }, []);
-
-  // Save data to persistent storage
-  useEffect(() => {
-    if (!isLoaded) return;
-    
-    const today = new Date().toDateString();
-    setItem<JapData>('radha-jap-data', {
-      count,
-      todayCount,
-      streak,
-      lastDate: today
-    });
-  }, [count, todayCount, streak, isLoaded]);
-
   const handleCount = () => {
-    const today = new Date().toDateString();
-    const newCount = count + 1;
-    const newTodayCount = todayCount + 1;
-    
-    setCount(newCount);
-    setTodayCount(newTodayCount);
-    
-    // Update streak if this is first Jap of the day
-    if (todayCount === 0 && lastDate !== today) {
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      if (lastDate === yesterday.toDateString() || !lastDate) {
-        setStreak(streak + 1);
-      } else {
-        setStreak(1);
-      }
-      setLastDate(today);
-    }
+    increment();
   };
 
   const handleMalaComplete = () => {
     // Check for daily target achievement
-    const settings = localStorage.getItem('radha-jap-settings');
-    let dailyTarget = 108;
-    if (settings) {
-      const parsed = JSON.parse(settings);
-      dailyTarget = parsed.dailyTarget || 108;
-    }
-    
-    const malas = Math.floor(count / 108) + 1;
+    const dailyTarget = profile?.daily_target || 108;
+    const newTodayCount = counter.today_count + (108 - (counter.count % 108));
     
     toast.success("🎉 Mala Complete!", {
-      description: `Radhe Radhe! ${malas} mala${malas > 1 ? 's' : ''} completed with devotion.`,
+      description: `Radhe Radhe! ${malas + 1} mala${malas + 1 > 1 ? 's' : ''} completed with devotion.`,
       duration: 3000,
     });
     
     // Check if daily target reached
-    if (todayCount + 108 >= dailyTarget) {
+    if (newTodayCount >= dailyTarget) {
       setTimeout(() => {
         toast.success("🏆 Daily Target Achieved!", {
           description: "Congratulations! You've reached your daily goal.",
@@ -118,11 +44,22 @@ const Home = () => {
 
   const handleReset = () => {
     if (confirm("Are you sure you want to reset your counter? Your stats will be preserved.")) {
-      setCount(0);
-      setTodayCount(0);
-      toast.info("Counter reset successfully");
+      reset();
     }
   };
+
+  if (counterLoading) {
+    return (
+      <div className="min-h-screen gradient-peaceful flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 mx-auto rounded-full gradient-divine flex items-center justify-center shadow-divine animate-pulse">
+            <Sparkles className="h-8 w-8 text-white" />
+          </div>
+          <p className="text-muted-foreground">Loading your spiritual journey...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen gradient-peaceful relative overflow-hidden pb-20">
@@ -136,13 +73,20 @@ const Home = () => {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-primary">राधा नाम जप</h1>
-                <p className="text-xs text-muted-foreground">Radha Naam Jap Counter</p>
+                <p className="text-xs text-muted-foreground">
+                  {profile?.display_name || user?.email}
+                </p>
               </div>
             </div>
-            <Button variant="outline" size="sm" onClick={handleReset}>
-              <RotateCcw className="h-4 w-4 mr-2" />
-              Reset
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={handleReset}>
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Reset
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => signOut()}>
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -152,22 +96,22 @@ const Home = () => {
         <div className="grid grid-cols-3 gap-3 text-center">
           <div className="bg-card/50 backdrop-blur-sm rounded-lg p-3 border border-border/50">
             <p className="text-xs text-muted-foreground mb-1">Today</p>
-            <p className="text-2xl font-bold text-primary">{todayCount}</p>
+            <p className="text-2xl font-bold text-primary">{counter.today_count}</p>
           </div>
           <div className="bg-card/50 backdrop-blur-sm rounded-lg p-3 border border-border/50">
             <p className="text-xs text-muted-foreground mb-1">Malas</p>
-            <p className="text-2xl font-bold">{Math.floor(count / 108)}</p>
+            <p className="text-2xl font-bold">{malas}</p>
           </div>
           <div className="bg-card/50 backdrop-blur-sm rounded-lg p-3 border border-border/50">
-            <p className="text-xs text-muted-foreground mb-1">Streak</p>
-            <p className="text-2xl font-bold text-accent">{streak}</p>
+            <p className="text-xs text-muted-foreground mb-1">Total</p>
+            <p className="text-2xl font-bold text-accent">{counter.count}</p>
           </div>
         </div>
 
         {/* Counter Section */}
         <div className="flex justify-center py-8">
           <CounterButton 
-            count={count} 
+            count={counter.count} 
             onCount={handleCount}
             onMalaComplete={handleMalaComplete}
           />

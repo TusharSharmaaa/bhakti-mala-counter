@@ -4,45 +4,43 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Settings as SettingsIcon, Bell, Target, Moon, Sun, Volume2 } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Target, Moon, Sun, Volume2, LogOut } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { toast } from "sonner";
+import { useProfile } from "@/hooks/useProfile";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Settings = () => {
+  const { signOut } = useAuth();
+  const { profile, loading, updateProfile } = useProfile();
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(false);
   const [dailyTarget, setDailyTarget] = useState(108);
-  const [soundOptions, setSoundOptions] = useState({
-    radha: true,
-    om: false,
-    bell: false,
-    silent: false
-  });
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [soundOption, setSoundOption] = useState('radha');
 
   useEffect(() => {
-    const saved = localStorage.getItem('radha-jap-settings');
-    if (saved) {
-      const settings = JSON.parse(saved);
-      setDarkMode(settings.darkMode || false);
-      setNotifications(settings.notifications || false);
-      setDailyTarget(settings.dailyTarget || 108);
-      setSoundOptions(settings.soundOptions || soundOptions);
+    if (profile) {
+      setDarkMode(profile.dark_mode);
+      setNotifications(profile.notifications_enabled);
+      setDailyTarget(profile.daily_target);
+      setSoundEnabled(profile.sound_enabled);
+      setSoundOption(profile.sound_option);
       
-      if (settings.darkMode) {
+      if (profile.dark_mode) {
         document.documentElement.classList.add('dark');
       }
     }
-  }, []);
+  }, [profile]);
 
-  const saveSettings = () => {
-    const settings = {
-      darkMode,
-      notifications,
-      dailyTarget,
-      soundOptions
-    };
-    localStorage.setItem('radha-jap-settings', JSON.stringify(settings));
-    toast.success("Settings saved successfully!");
+  const saveSettings = async () => {
+    await updateProfile({
+      dark_mode: darkMode,
+      notifications_enabled: notifications,
+      daily_target: dailyTarget,
+      sound_enabled: soundEnabled,
+      sound_option: soundOption,
+    });
   };
 
   const handleDarkModeToggle = (checked: boolean) => {
@@ -68,18 +66,31 @@ const Settings = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen gradient-peaceful flex items-center justify-center">
+        <p className="text-muted-foreground">Loading settings...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen gradient-peaceful pb-20">
       <header className="border-b border-border/50 backdrop-blur-sm bg-background/50">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full gradient-divine flex items-center justify-center shadow-divine">
-              <SettingsIcon className="h-5 w-5 text-white" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full gradient-divine flex items-center justify-center shadow-divine">
+                <SettingsIcon className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-primary">Settings</h1>
+                <p className="text-sm text-muted-foreground">Customize your experience</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-primary">Settings</h1>
-              <p className="text-sm text-muted-foreground">Customize your experience</p>
-            </div>
+            <Button variant="ghost" size="sm" onClick={() => signOut()}>
+              <LogOut className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </header>
@@ -166,37 +177,41 @@ const Settings = () => {
           <CardContent className="space-y-4">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label htmlFor="sound-radha">Radha (Voice)</Label>
+                <Label htmlFor="sound-enabled">Enable Sound</Label>
                 <Switch
-                  id="sound-radha"
-                  checked={soundOptions.radha}
-                  onCheckedChange={(checked) => setSoundOptions({...soundOptions, radha: checked, om: false, bell: false, silent: false})}
+                  id="sound-enabled"
+                  checked={soundEnabled}
+                  onCheckedChange={setSoundEnabled}
                 />
               </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="sound-om">OM Chanting</Label>
-                <Switch
-                  id="sound-om"
-                  checked={soundOptions.om}
-                  onCheckedChange={(checked) => setSoundOptions({...soundOptions, om: checked, radha: false, bell: false, silent: false})}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="sound-bell">Temple Bell</Label>
-                <Switch
-                  id="sound-bell"
-                  checked={soundOptions.bell}
-                  onCheckedChange={(checked) => setSoundOptions({...soundOptions, bell: checked, radha: false, om: false, silent: false})}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="sound-silent">Silent</Label>
-                <Switch
-                  id="sound-silent"
-                  checked={soundOptions.silent}
-                  onCheckedChange={(checked) => setSoundOptions({...soundOptions, silent: checked, radha: false, om: false, bell: false})}
-                />
-              </div>
+              {soundEnabled && (
+                <>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="sound-radha">Radha (Voice)</Label>
+                    <Switch
+                      id="sound-radha"
+                      checked={soundOption === 'radha'}
+                      onCheckedChange={(checked) => checked && setSoundOption('radha')}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="sound-om">OM Chanting</Label>
+                    <Switch
+                      id="sound-om"
+                      checked={soundOption === 'om'}
+                      onCheckedChange={(checked) => checked && setSoundOption('om')}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="sound-bell">Temple Bell</Label>
+                    <Switch
+                      id="sound-bell"
+                      checked={soundOption === 'bell'}
+                      onCheckedChange={(checked) => checked && setSoundOption('bell')}
+                    />
+                  </div>
+                </>
+              )}
             </div>
           </CardContent>
         </Card>
