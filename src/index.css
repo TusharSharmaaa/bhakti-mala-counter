@@ -119,12 +119,14 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
-  body {
+  html, body {
     @apply bg-background text-foreground;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     touch-action: manipulation;
-    overscroll-behavior-y: none;
+    overscroll-behavior: none;
     -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
   }
 }
 
@@ -192,6 +194,31 @@ button:not(.unstyled) {
   
   .animate-float {
     animation: float 6s ease-in-out infinite;
+  }
+  
+  /* Safe area padding for notches */
+  .safe-padding {
+    padding-top: max(16px, env(safe-area-inset-top));
+    padding-right: max(16px, env(safe-area-inset-right));
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+    padding-left: max(16px, env(safe-area-inset-left));
+  }
+  
+  /* Prevent duplicate hero circles */
+  .hero-ring-secondary {
+    display: none !important;
+  }
+  
+  .hero-ring-primary {
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Counter button specific */
+  .counter-btn {
+    min-height: 56px;
+    user-select: none;
+    -webkit-user-select: none;
   }
 }
 

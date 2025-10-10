@@ -1,16 +1,18 @@
 import CounterButton from "@/components/CounterButton";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, Sparkles, LogOut } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Settings as SettingsIcon, Sparkles, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
 import { useCounter } from "@/hooks/useCounter";
 import { useProfile } from "@/hooks/useProfile";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWakeLock } from "@/hooks/useWakeLock";
+import Settings from "@/pages/Settings";
 
 const Home = () => {
   const { user, signOut } = useAuth();
-  const { counter, loading: counterLoading, increment, reset } = useCounter();
+  const { counter, loading: counterLoading, increment, decrement, reset } = useCounter();
   const { profile } = useProfile();
   const malas = Math.floor(counter.count / 108);
 
@@ -48,6 +50,10 @@ const Home = () => {
     }
   };
 
+  const handleUndo = () => {
+    decrement();
+  };
+
   if (counterLoading) {
     return (
       <div className="min-h-screen gradient-peaceful flex items-center justify-center">
@@ -62,28 +68,47 @@ const Home = () => {
   }
 
   return (
-    <div className="min-h-screen gradient-peaceful relative overflow-hidden pb-20">
-      {/* Header */}
+    <div className="min-h-screen gradient-peaceful relative overflow-hidden pb-20 safe-padding">
+      {/* Compact Header */}
       <header className="border-b border-border/50 backdrop-blur-sm bg-background/50">
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full gradient-divine flex items-center justify-center shadow-divine">
-                <Sparkles className="h-5 w-5 text-white" />
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full gradient-divine flex items-center justify-center shadow-divine">
+                <Sparkles className="h-4 w-4 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-primary">राधा नाम जप</h1>
-                <p className="text-xs text-muted-foreground">
-                  {profile?.display_name || user?.email}
-                </p>
+                <h1 className="text-xl font-bold text-primary">राधा नाम जप</h1>
               </div>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={handleReset}>
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Reset
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => signOut()}>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="h-10 w-10 rounded-full"
+                    aria-label="Open settings"
+                  >
+                    <SettingsIcon className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent>
+                  <SheetHeader>
+                    <SheetTitle>Settings</SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-6">
+                    <Settings />
+                  </div>
+                </SheetContent>
+              </Sheet>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="h-10 w-10"
+                onClick={() => signOut()}
+                aria-label="Sign out"
+              >
                 <LogOut className="h-4 w-4" />
               </Button>
             </div>
@@ -114,6 +139,7 @@ const Home = () => {
             count={counter.count} 
             onCount={handleCount}
             onMalaComplete={handleMalaComplete}
+            onUndo={handleUndo}
           />
         </div>
 

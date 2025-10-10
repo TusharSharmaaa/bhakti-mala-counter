@@ -136,6 +136,36 @@ export function useCounter() {
     }
   };
 
+  const decrement = async () => {
+    if (!user || counter.count === 0) return;
+
+    const newCount = Math.max(0, counter.count - 1);
+    const newTodayCount = Math.max(0, counter.today_count - 1);
+
+    // Optimistic update
+    setCounter({
+      ...counter,
+      count: newCount,
+      today_count: newTodayCount,
+    });
+
+    // Update database
+    const { error } = await supabase
+      .from('counters')
+      .update({
+        count: newCount,
+        today_count: newTodayCount,
+      })
+      .eq('user_id', user.id);
+
+    if (error) {
+      console.error('Error updating counter:', error);
+      toast.error('Failed to undo count');
+      // Revert optimistic update
+      setCounter(counter);
+    }
+  };
+
   const reset = async () => {
     if (!user) return;
 
@@ -202,6 +232,7 @@ export function useCounter() {
     counter,
     loading,
     increment,
+    decrement,
     reset,
   };
 }
