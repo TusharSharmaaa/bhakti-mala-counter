@@ -12,7 +12,8 @@ const CounterButton = ({ count, onCount, onMalaComplete }: CounterButtonProps) =
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
   const currentMalaCount = count % 108;
-  const progress = currentMalaCount / 108;
+  const progress = currentMalaCount / 108; // 0 to 1 for SVG calculation
+  const progressPercent = Math.floor((currentMalaCount * 100) / 108); // Accurate percentage
 
   const handleClick = () => {
     setIsPressed(true);
@@ -35,26 +36,36 @@ const CounterButton = ({ count, onCount, onMalaComplete }: CounterButtonProps) =
       }
     }
     
-    // Play "Radha" sound if enabled
+    // Play "Radha" sound with low latency
     if (soundEnabled) {
+      // Use pointerdown for better audio responsiveness
       const settings = localStorage.getItem('radha-jap-settings');
       let soundOption = 'radha';
       
       if (settings) {
-        const parsed = JSON.parse(settings);
-        if (parsed.soundOptions) {
-          if (parsed.soundOptions.om) soundOption = 'om';
-          else if (parsed.soundOptions.bell) soundOption = 'bell';
-          else if (parsed.soundOptions.silent) soundOption = 'silent';
+        try {
+          const parsed = JSON.parse(settings);
+          if (parsed.soundOptions) {
+            if (parsed.soundOptions.om) soundOption = 'om';
+            else if (parsed.soundOptions.bell) soundOption = 'bell';
+            else if (parsed.soundOptions.silent) soundOption = 'silent';
+          }
+        } catch (e) {
+          console.warn('Failed to parse settings:', e);
         }
       }
       
       if (soundOption !== 'silent') {
+        // Queue speech immediately without awaiting other operations
         const text = soundOption === 'om' ? 'Om' : 'Radha';
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = soundOption === 'om' ? 0.8 : 1.2;
-        utterance.pitch = soundOption === 'om' ? 0.9 : 1.1;
-        utterance.volume = 0.5;
+        utterance.rate = soundOption === 'om' ? 0.8 : 1.4; // Faster for Radha
+        utterance.pitch = soundOption === 'om' ? 0.9 : 1.2;
+        utterance.volume = 0.6;
+        utterance.lang = soundOption === 'om' ? 'sa-IN' : 'hi-IN'; // Sanskrit/Hindi
+        
+        // Clear queue and speak immediately for low latency
+        window.speechSynthesis.cancel();
         window.speechSynthesis.speak(utterance);
       }
     }
@@ -148,6 +159,14 @@ const CounterButton = ({ count, onCount, onMalaComplete }: CounterButtonProps) =
         <p className="text-sm text-muted-foreground">
           {108 - currentMalaCount} more to complete this mala
         </p>
+        <p className="text-xs text-muted-foreground/70">
+          Progress: {progressPercent}%
+        </p>
+      </div>
+      
+      {/* Screen reader announcements for accessibility */}
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        Count: {currentMalaCount} of 108
       </div>
     </div>
   );

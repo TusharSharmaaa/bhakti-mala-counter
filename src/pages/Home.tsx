@@ -4,51 +4,69 @@ import { Button } from "@/components/ui/button";
 import { RotateCcw, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
+import { getItem, setItem } from "@/lib/storage";
+import { useWakeLock } from "@/hooks/useWakeLock";
+
+interface JapData {
+  count: number;
+  todayCount: number;
+  streak: number;
+  lastDate: string;
+}
 
 const Home = () => {
   const [count, setCount] = useState(0);
   const [todayCount, setTodayCount] = useState(0);
   const [streak, setStreak] = useState(0);
   const [lastDate, setLastDate] = useState<string>("");
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load data from localStorage
+  // Keep screen awake during japa
+  useWakeLock(true);
+
+  // Load data from IndexedDB/localStorage
   useEffect(() => {
-    const saved = localStorage.getItem('radha-jap-data');
-    if (saved) {
-      const data = JSON.parse(saved);
-      setCount(data.count || 0);
-      setStreak(data.streak || 0);
-      setLastDate(data.lastDate || "");
-      
-      // Check if it's a new day
-      const today = new Date().toDateString();
-      if (data.lastDate === today) {
-        setTodayCount(data.todayCount || 0);
-      } else {
-        // New day - check streak
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        if (data.lastDate === yesterday.toDateString()) {
-          // Streak continues
-        } else if (data.lastDate) {
-          // Streak broken
-          setStreak(0);
+    getItem<JapData>('radha-jap-data').then(data => {
+      if (data) {
+        setCount(data.count || 0);
+        setStreak(data.streak || 0);
+        setLastDate(data.lastDate || "");
+        
+        // Check if it's a new day
+        const today = new Date().toDateString();
+        if (data.lastDate === today) {
+          setTodayCount(data.todayCount || 0);
+        } else {
+          // New day - check streak
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          if (data.lastDate === yesterday.toDateString()) {
+            // Streak continues
+          } else if (data.lastDate) {
+            // Streak broken
+            setStreak(0);
+          }
+          setTodayCount(0);
         }
-        setTodayCount(0);
       }
-    }
+      setIsLoaded(true);
+    }).catch(() => {
+      setIsLoaded(true);
+    });
   }, []);
 
-  // Save data to localStorage
+  // Save data to persistent storage
   useEffect(() => {
+    if (!isLoaded) return;
+    
     const today = new Date().toDateString();
-    localStorage.setItem('radha-jap-data', JSON.stringify({
+    setItem<JapData>('radha-jap-data', {
       count,
       todayCount,
       streak,
       lastDate: today
-    }));
-  }, [count, todayCount, streak]);
+    });
+  }, [count, todayCount, streak, isLoaded]);
 
   const handleCount = () => {
     const today = new Date().toDateString();
