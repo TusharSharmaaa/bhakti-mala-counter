@@ -20,7 +20,30 @@ const Stats = () => {
         setTodayCount(data.todayCount || 0);
       }
     }
+    
+    // Check for notifications
+    checkDailyReminder();
   }, []);
+  
+  const checkDailyReminder = () => {
+    const settings = localStorage.getItem('radha-jap-settings');
+    if (settings) {
+      const parsed = JSON.parse(settings);
+      if (parsed.notifications && todayCount === 0 && 'Notification' in window && Notification.permission === 'granted') {
+        const now = new Date();
+        const lastNotif = localStorage.getItem('last-notification');
+        const today = now.toDateString();
+        
+        if (lastNotif !== today && now.getHours() >= 18) {
+          new Notification("🙏 Radha Naam Jap Reminder", {
+            body: "Don't forget your daily Jap! Maintain your streak.",
+            icon: "/favicon.ico"
+          });
+          localStorage.setItem('last-notification', today);
+        }
+      }
+    }
+  };
 
   const totalMalas = Math.floor(count / 108);
   const todayMalas = Math.floor(todayCount / 108);

@@ -18,24 +18,51 @@ const CounterButton = ({ count, onCount, onMalaComplete }: CounterButtonProps) =
     setIsPressed(true);
     setTimeout(() => setIsPressed(false), 150);
     
-    // Haptic feedback
+    const nextCount = count + 1;
+    const nextMalaCount = nextCount % 108;
+    
+    // Milestone haptic feedback (9, 21, 108)
     if (navigator.vibrate) {
-      navigator.vibrate(50);
+      if (nextMalaCount === 0) {
+        // Mala complete - strong vibration
+        navigator.vibrate([100, 50, 100, 50, 100]);
+      } else if (nextMalaCount === 9 || nextMalaCount === 21) {
+        // Milestones - double vibration
+        navigator.vibrate([50, 30, 50]);
+      } else {
+        // Regular tap
+        navigator.vibrate(50);
+      }
     }
     
     // Play "Radha" sound if enabled
     if (soundEnabled) {
-      const utterance = new SpeechSynthesisUtterance("Radha");
-      utterance.rate = 1.2;
-      utterance.pitch = 1.1;
-      utterance.volume = 0.5;
-      window.speechSynthesis.speak(utterance);
+      const settings = localStorage.getItem('radha-jap-settings');
+      let soundOption = 'radha';
+      
+      if (settings) {
+        const parsed = JSON.parse(settings);
+        if (parsed.soundOptions) {
+          if (parsed.soundOptions.om) soundOption = 'om';
+          else if (parsed.soundOptions.bell) soundOption = 'bell';
+          else if (parsed.soundOptions.silent) soundOption = 'silent';
+        }
+      }
+      
+      if (soundOption !== 'silent') {
+        const text = soundOption === 'om' ? 'Om' : 'Radha';
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = soundOption === 'om' ? 0.8 : 1.2;
+        utterance.pitch = soundOption === 'om' ? 0.9 : 1.1;
+        utterance.volume = 0.5;
+        window.speechSynthesis.speak(utterance);
+      }
     }
     
     onCount();
     
     // Check if mala is complete
-    if ((count + 1) % 108 === 0) {
+    if (nextMalaCount === 0) {
       onMalaComplete();
     }
   };
@@ -89,15 +116,21 @@ const CounterButton = ({ count, onCount, onMalaComplete }: CounterButtonProps) =
           </defs>
         </svg>
 
-        {/* Counter Button */}
+        {/* Counter Button with Wave Effect */}
         <button
           onClick={handleClick}
           className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
             w-64 h-64 rounded-full gradient-divine shadow-divine glow-radha
             flex flex-col items-center justify-center gap-2
-            transition-all duration-150 active:scale-95
+            transition-all duration-150 active:scale-95 overflow-hidden relative
             ${isPressed ? 'scale-95' : 'scale-100 hover:scale-105'}`}
         >
+          {/* Wave Effect */}
+          {isPressed && (
+            <div className="absolute inset-0 rounded-full">
+              <div className="absolute inset-0 rounded-full bg-white/30 animate-ping" />
+            </div>
+          )}
           <span className="text-white/80 text-sm font-medium tracking-wider uppercase">
             राधा राधा
           </span>

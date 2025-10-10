@@ -72,10 +72,30 @@ const Home = () => {
   };
 
   const handleMalaComplete = () => {
+    // Check for daily target achievement
+    const settings = localStorage.getItem('radha-jap-settings');
+    let dailyTarget = 108;
+    if (settings) {
+      const parsed = JSON.parse(settings);
+      dailyTarget = parsed.dailyTarget || 108;
+    }
+    
+    const malas = Math.floor(count / 108) + 1;
+    
     toast.success("🎉 Mala Complete!", {
-      description: "Radhe Radhe! One more mala completed with devotion.",
+      description: `Radhe Radhe! ${malas} mala${malas > 1 ? 's' : ''} completed with devotion.`,
       duration: 3000,
     });
+    
+    // Check if daily target reached
+    if (todayCount + 108 >= dailyTarget) {
+      setTimeout(() => {
+        toast.success("🏆 Daily Target Achieved!", {
+          description: "Congratulations! You've reached your daily goal.",
+          duration: 4000,
+        });
+      }, 1000);
+    }
   };
 
   const handleReset = () => {

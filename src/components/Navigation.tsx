@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, TrendingUp, BookOpen, Sparkles } from "lucide-react";
+import { Home, TrendingUp, BookOpen, Timer, Settings } from "lucide-react";
 
 const Navigation = () => {
   const location = useLocation();
@@ -8,6 +8,8 @@ const Navigation = () => {
     { path: "/", icon: Home, label: "Counter" },
     { path: "/stats", icon: TrendingUp, label: "Stats" },
     { path: "/spiritual", icon: BookOpen, label: "Content" },
+    { path: "/timer", icon: Timer, label: "Timer" },
+    { path: "/settings", icon: Settings, label: "Settings" },
   ];
   
   return (
