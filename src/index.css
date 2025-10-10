@@ -216,9 +216,21 @@ button:not(.unstyled) {
   
   /* Counter button specific */
   .counter-btn {
-    min-height: 56px;
+    min-height: 280px;
     user-select: none;
     -webkit-user-select: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Glow pulse animation for counter */
+  @keyframes glow-pulse {
+    0%, 100% {
+      filter: drop-shadow(0 0 20px rgba(255, 105, 180, 0.4));
+    }
+    50% {
+      filter: drop-shadow(0 0 35px rgba(255, 130, 200, 0.6));
+    }
   }
 }
 

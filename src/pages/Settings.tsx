@@ -171,7 +171,7 @@ const Settings = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <Label htmlFor="sound-enabled">Enable Sound</Label>
                 <Switch
@@ -181,32 +181,74 @@ const Settings = () => {
                 />
               </div>
               {soundEnabled && (
-                <>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="sound-radha">Radha (Voice)</Label>
-                    <Switch
-                      id="sound-radha"
-                      checked={soundOption === 'radha'}
-                      onCheckedChange={(checked) => checked && setSoundOption('radha')}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="sound-om">OM Chanting</Label>
-                    <Switch
-                      id="sound-om"
-                      checked={soundOption === 'om'}
-                      onCheckedChange={(checked) => checked && setSoundOption('om')}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="sound-bell">Temple Bell</Label>
-                    <Switch
-                      id="sound-bell"
-                      checked={soundOption === 'bell'}
-                      onCheckedChange={(checked) => checked && setSoundOption('bell')}
-                    />
-                  </div>
-                </>
+                <div className="space-y-3 pl-2">
+                  <p className="text-xs text-muted-foreground mb-3">Select tap sound:</p>
+                  {/* Radha Voice Option */}
+                  <button
+                    onClick={() => setSoundOption('radha')}
+                    className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-accent/10 transition-colors group"
+                  >
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                      soundOption === 'radha' 
+                        ? 'bg-primary text-primary-foreground shadow-lg scale-110' 
+                        : 'bg-muted text-muted-foreground border-2 border-border'
+                    }`}>
+                      {soundOption === 'radha' && (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </div>
+                    <div className="flex-1 text-left">
+                      <Label className="cursor-pointer text-base font-medium">Radha (Voice)</Label>
+                      <p className="text-xs text-muted-foreground">Gentle devotional voice</p>
+                    </div>
+                  </button>
+
+                  {/* OM Chanting Option */}
+                  <button
+                    onClick={() => setSoundOption('om')}
+                    className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-accent/10 transition-colors group"
+                  >
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                      soundOption === 'om' 
+                        ? 'bg-primary text-primary-foreground shadow-lg scale-110' 
+                        : 'bg-muted text-muted-foreground border-2 border-border'
+                    }`}>
+                      {soundOption === 'om' && (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </div>
+                    <div className="flex-1 text-left">
+                      <Label className="cursor-pointer text-base font-medium">OM Chanting</Label>
+                      <p className="text-xs text-muted-foreground">Sacred mantra sound</p>
+                    </div>
+                  </button>
+
+                  {/* Temple Bell Option */}
+                  <button
+                    onClick={() => setSoundOption('bell')}
+                    className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-accent/10 transition-colors group"
+                  >
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                      soundOption === 'bell' 
+                        ? 'bg-primary text-primary-foreground shadow-lg scale-110' 
+                        : 'bg-muted text-muted-foreground border-2 border-border'
+                    }`}>
+                      {soundOption === 'bell' && (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </div>
+                    <div className="flex-1 text-left">
+                      <Label className="cursor-pointer text-base font-medium">Temple Bell</Label>
+                      <p className="text-xs text-muted-foreground">Traditional bell chime</p>
+                    </div>
+                  </button>
+                </div>
               )}
             </div>
           </CardContent>

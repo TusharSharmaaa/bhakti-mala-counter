@@ -90,19 +90,28 @@ const Home = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8 space-y-8">
-        {/* Quick Stats */}
+        {/* Quick Stats with Enhanced Interactivity */}
         <div className="grid grid-cols-3 gap-3 text-center">
-          <div className="bg-card/50 backdrop-blur-sm rounded-lg p-3 border border-border/50">
+          <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:scale-105 cursor-pointer group">
+            <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+              <Sparkles className="h-4 w-4 text-primary" />
+            </div>
             <p className="text-xs text-muted-foreground mb-1">Today</p>
-            <p className="text-2xl font-bold text-primary">{counter.today_count}</p>
+            <p className="text-3xl font-bold text-primary">{counter.today_count}</p>
           </div>
-          <div className="bg-card/50 backdrop-blur-sm rounded-lg p-3 border border-border/50">
+          <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50 hover:border-accent/50 transition-all hover:shadow-lg hover:scale-105 cursor-pointer group">
+            <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
+              <span className="text-xl">🔮</span>
+            </div>
             <p className="text-xs text-muted-foreground mb-1">Malas</p>
-            <p className="text-2xl font-bold">{malas}</p>
+            <p className="text-3xl font-bold text-accent">{malas}</p>
           </div>
-          <div className="bg-card/50 backdrop-blur-sm rounded-lg p-3 border border-border/50">
+          <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50 hover:border-secondary/50 transition-all hover:shadow-lg hover:scale-105 cursor-pointer group">
+            <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-secondary/10 flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
+              <span className="text-xl">🙏</span>
+            </div>
             <p className="text-xs text-muted-foreground mb-1">Total</p>
-            <p className="text-2xl font-bold text-accent">{counter.count}</p>
+            <p className="text-3xl font-bold text-secondary">{counter.count}</p>
           </div>
         </div>
 
