@@ -4,15 +4,12 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Settings as SettingsIcon, Bell, Target, Moon, Sun, Volume2, LogOut } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Target, Moon, Sun, Volume2 } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { toast } from "sonner";
-import { useProfile } from "@/hooks/useProfile";
-import { useAuth } from "@/contexts/AuthContext";
 
 const Settings = () => {
-  const { signOut } = useAuth();
-  const { profile, loading, updateProfile } = useProfile();
+  const [loading, setLoading] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(false);
   const [dailyTarget, setDailyTarget] = useState(108);
@@ -20,27 +17,31 @@ const Settings = () => {
   const [soundOption, setSoundOption] = useState('radha');
 
   useEffect(() => {
-    if (profile) {
-      setDarkMode(profile.dark_mode);
-      setNotifications(profile.notifications_enabled);
-      setDailyTarget(profile.daily_target);
-      setSoundEnabled(profile.sound_enabled);
-      setSoundOption(profile.sound_option);
-      
-      if (profile.dark_mode) {
-        document.documentElement.classList.add('dark');
-      }
+    // Load from localStorage
+    const savedDarkMode = localStorage.getItem('radha-dark-mode');
+    const savedNotifications = localStorage.getItem('radha-notifications');
+    const savedDailyTarget = localStorage.getItem('radha-daily-target');
+    const savedSoundEnabled = localStorage.getItem('radha-sound-enabled');
+    const savedSoundOption = localStorage.getItem('radha-sound-option');
+    
+    if (savedDarkMode) setDarkMode(JSON.parse(savedDarkMode));
+    if (savedNotifications) setNotifications(JSON.parse(savedNotifications));
+    if (savedDailyTarget) setDailyTarget(JSON.parse(savedDailyTarget));
+    if (savedSoundEnabled) setSoundEnabled(JSON.parse(savedSoundEnabled));
+    if (savedSoundOption) setSoundOption(JSON.parse(savedSoundOption));
+    
+    if (JSON.parse(savedDarkMode || 'false')) {
+      document.documentElement.classList.add('dark');
     }
-  }, [profile]);
+  }, []);
 
   const saveSettings = async () => {
-    await updateProfile({
-      dark_mode: darkMode,
-      notifications_enabled: notifications,
-      daily_target: dailyTarget,
-      sound_enabled: soundEnabled,
-      sound_option: soundOption,
-    });
+    localStorage.setItem('radha-dark-mode', JSON.stringify(darkMode));
+    localStorage.setItem('radha-notifications', JSON.stringify(notifications));
+    localStorage.setItem('radha-daily-target', JSON.stringify(dailyTarget));
+    localStorage.setItem('radha-sound-enabled', JSON.stringify(soundEnabled));
+    localStorage.setItem('radha-sound-option', JSON.stringify(soundOption));
+    toast.success("Settings saved!");
   };
 
   const handleDarkModeToggle = (checked: boolean) => {
@@ -66,31 +67,18 @@ const Settings = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen gradient-peaceful flex items-center justify-center">
-        <p className="text-muted-foreground">Loading settings...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen gradient-peaceful pb-20">
       <header className="border-b border-border/50 backdrop-blur-sm bg-background/50">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full gradient-divine flex items-center justify-center shadow-divine">
-                <SettingsIcon className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-primary">Settings</h1>
-                <p className="text-sm text-muted-foreground">Customize your experience</p>
-              </div>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full gradient-divine flex items-center justify-center shadow-divine">
+              <SettingsIcon className="h-5 w-5 text-white" />
             </div>
-            <Button variant="ghost" size="sm" onClick={() => signOut()}>
-              <LogOut className="h-4 w-4" />
-            </Button>
+            <div>
+              <h1 className="text-2xl font-bold text-primary">Settings</h1>
+              <p className="text-sm text-muted-foreground">Customize your experience</p>
+            </div>
           </div>
         </div>
       </header>
@@ -100,7 +88,9 @@ const Settings = () => {
         <Card className="shadow-soft border-border/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              {darkMode ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                {darkMode ? <Moon className="h-4 w-4 text-primary" /> : <Sun className="h-4 w-4 text-primary" />}
+              </div>
               Appearance
             </CardTitle>
           </CardHeader>
@@ -120,7 +110,9 @@ const Settings = () => {
         <Card className="shadow-soft border-border/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5 text-primary" />
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <Target className="h-4 w-4 text-primary" />
+              </div>
               Daily Target
             </CardTitle>
           </CardHeader>
@@ -147,7 +139,9 @@ const Settings = () => {
         <Card className="shadow-soft border-border/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Bell className="h-5 w-5 text-primary" />
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <Bell className="h-4 w-4 text-primary" />
+              </div>
               Notifications
             </CardTitle>
           </CardHeader>
@@ -170,7 +164,9 @@ const Settings = () => {
         <Card className="shadow-soft border-border/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Volume2 className="h-5 w-5 text-primary" />
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <Volume2 className="h-4 w-4 text-primary" />
+              </div>
               Sound Options
             </CardTitle>
           </CardHeader>

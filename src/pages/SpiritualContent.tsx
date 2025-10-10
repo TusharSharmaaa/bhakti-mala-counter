@@ -15,9 +15,11 @@ const SpiritualContent = () => {
   const randomStory = hinduStories[Math.floor(Math.random() * hinduStories.length)];
 
   const shareToWhatsApp = (text: string, type: string) => {
-    const message = `${text}\n\n— Shri Premanand Maharaj Ji\n🙏 Radhe Radhe`;
+    const appLink = '\n\n📱 Download Radha Naam Jap Counter:\nhttps://play.google.com/store/apps/details?id=com.bhaktimala.counter';
+    const message = `${text}\n\n— Shri Premanand Maharaj Ji\n🙏 Radhe Radhe${appLink}`;
     const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
+    toast.success("Opening WhatsApp...");
   };
 
   return (

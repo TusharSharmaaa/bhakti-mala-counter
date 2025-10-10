@@ -49,10 +49,33 @@ const MeditationTimer = () => {
       duration: 5000,
     });
     
+    // Play completion sound
+    playCompletionSound();
+    
     // Haptic feedback
     if (navigator.vibrate) {
       navigator.vibrate([200, 100, 200, 100, 200]);
     }
+  };
+
+  const playCompletionSound = () => {
+    // Create a spiritual bell sound using Web Audio API
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    // Bell-like tone
+    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 1.5);
+    
+    gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 2);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 2);
   };
 
   const handlePlayPause = () => {

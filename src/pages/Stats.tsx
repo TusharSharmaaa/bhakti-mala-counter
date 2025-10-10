@@ -1,14 +1,10 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Flame, Target, Calendar, TrendingUp, Award, LogOut } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Flame, Target, Calendar, Award } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { useCounter } from "@/hooks/useCounter";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 
 const Stats = () => {
-  const { signOut } = useAuth();
   const { counter, loading } = useCounter();
   const [streakData, setStreakData] = useState({ current_streak: 0, longest_streak: 0, total_malas: 0 });
 
@@ -17,14 +13,13 @@ const Stats = () => {
   }, []);
 
   const loadStreakData = async () => {
-    const { data } = await supabase
-      .from('streaks')
-      .select('*')
-      .maybeSingle();
-    
-    if (data) {
-      setStreakData(data);
-    }
+    // Calculate streaks from counter data
+    const totalMalas = Math.floor(counter.count / 108);
+    setStreakData({
+      current_streak: 0,
+      longest_streak: 0,
+      total_malas: totalMalas
+    });
   };
 
   const totalMalas = Math.floor(counter.count / 108);
@@ -42,14 +37,11 @@ const Stats = () => {
   return (
     <div className="min-h-screen gradient-peaceful pb-20">
       <header className="border-b border-border/50 backdrop-blur-sm bg-background/50">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+        <div className="container mx-auto px-4 py-4">
           <div>
             <h1 className="text-2xl font-bold text-primary">Your Journey</h1>
             <p className="text-sm text-muted-foreground">Track your spiritual progress</p>
           </div>
-          <Button variant="ghost" size="sm" onClick={() => signOut()}>
-            <LogOut className="h-4 w-4" />
-          </Button>
         </div>
       </header>
 
