@@ -1,19 +1,15 @@
 import CounterButton from "@/components/CounterButton";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Settings as SettingsIcon, Sparkles, LogOut } from "lucide-react";
+import { Settings as SettingsIcon, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
 import { useCounter } from "@/hooks/useCounter";
-import { useProfile } from "@/hooks/useProfile";
-import { useAuth } from "@/contexts/AuthContext";
 import { useWakeLock } from "@/hooks/useWakeLock";
 import Settings from "@/pages/Settings";
 
 const Home = () => {
-  const { user, signOut } = useAuth();
   const { counter, loading: counterLoading, increment, decrement, reset } = useCounter();
-  const { profile } = useProfile();
   const malas = Math.floor(counter.count / 108);
 
   // Keep screen awake during japa
@@ -24,24 +20,10 @@ const Home = () => {
   };
 
   const handleMalaComplete = () => {
-    // Check for daily target achievement
-    const dailyTarget = profile?.daily_target || 108;
-    const newTodayCount = counter.today_count + (108 - (counter.count % 108));
-    
     toast.success("🎉 Mala Complete!", {
       description: `Radhe Radhe! ${malas + 1} mala${malas + 1 > 1 ? 's' : ''} completed with devotion.`,
       duration: 3000,
     });
-    
-    // Check if daily target reached
-    if (newTodayCount >= dailyTarget) {
-      setTimeout(() => {
-        toast.success("🏆 Daily Target Achieved!", {
-          description: "Congratulations! You've reached your daily goal.",
-          duration: 4000,
-        });
-      }, 1000);
-    }
   };
 
   const handleReset = () => {
@@ -78,7 +60,7 @@ const Home = () => {
                 <Sparkles className="h-4 w-4 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-primary">राधा नाम जप</h1>
+                <h1 className="text-xl font-bold text-primary">Radha Naam Jap</h1>
               </div>
             </div>
             <div className="flex gap-2">
@@ -102,15 +84,6 @@ const Home = () => {
                   </div>
                 </SheetContent>
               </Sheet>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                className="h-10 w-10"
-                onClick={() => signOut()}
-                aria-label="Sign out"
-              >
-                <LogOut className="h-4 w-4" />
-              </Button>
             </div>
           </div>
         </div>
