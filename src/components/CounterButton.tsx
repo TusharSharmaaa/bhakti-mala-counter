@@ -11,7 +11,8 @@ interface CounterButtonProps {
 const CounterButton = ({ count, onCount, onMalaComplete }: CounterButtonProps) => {
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
-  const progress = (count % 108) / 108;
+  const currentMalaCount = count % 108;
+  const progress = currentMalaCount / 108;
 
   const handleClick = () => {
     setIsPressed(true);
@@ -22,25 +23,13 @@ const CounterButton = ({ count, onCount, onMalaComplete }: CounterButtonProps) =
       navigator.vibrate(50);
     }
     
-    // Play sound if enabled
+    // Play "Radha" sound if enabled
     if (soundEnabled) {
-      const audio = new Audio();
-      audio.volume = 0.3;
-      // Using a bell sound frequency
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.value = 800;
-      oscillator.type = 'sine';
-      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-      
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.1);
+      const utterance = new SpeechSynthesisUtterance("Radha");
+      utterance.rate = 1.2;
+      utterance.pitch = 1.1;
+      utterance.volume = 0.5;
+      window.speechSynthesis.speak(utterance);
     }
     
     onCount();
@@ -113,7 +102,7 @@ const CounterButton = ({ count, onCount, onMalaComplete }: CounterButtonProps) =
             राधा राधा
           </span>
           <span className="text-white text-7xl font-bold tracking-tight">
-            {count % 108}
+            {currentMalaCount}
           </span>
           <span className="text-white/80 text-xs tracking-widest">
             {Math.floor(count / 108)} Mala{Math.floor(count / 108) !== 1 ? 's' : ''}
@@ -124,7 +113,7 @@ const CounterButton = ({ count, onCount, onMalaComplete }: CounterButtonProps) =
       {/* Current Count Display */}
       <div className="text-center space-y-1">
         <p className="text-sm text-muted-foreground">
-          {108 - (count % 108)} more to complete this mala
+          {108 - currentMalaCount} more to complete this mala
         </p>
       </div>
     </div>
