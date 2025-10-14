@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Settings as SettingsIcon, Bell, Target, Moon, Sun, Volume2 } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 const Settings = () => {
   const [loading, setLoading] = useState(false);
@@ -97,11 +98,15 @@ const Settings = () => {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <Label htmlFor="dark-mode">Dark Mode</Label>
-              <Switch
-                id="dark-mode"
-                checked={darkMode}
-                onCheckedChange={handleDarkModeToggle}
-              />
+              <div 
+                className={cn(
+                  "w-12 h-6 flex items-center rounded-full p-1 cursor-pointer",
+                  darkMode ? "bg-primary justify-end" : "bg-muted justify-start"
+                )}
+                onClick={() => handleDarkModeToggle(!darkMode)}
+              >
+                <div className="bg-white w-4 h-4 rounded-full shadow-md"></div>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -151,11 +156,15 @@ const Settings = () => {
                 <Label htmlFor="notifications">Daily Reminders</Label>
                 <p className="text-xs text-muted-foreground">Get reminded to maintain your streak</p>
               </div>
-              <Switch
-                id="notifications"
-                checked={notifications}
-                onCheckedChange={handleNotificationToggle}
-              />
+              <div 
+                className={cn(
+                  "w-12 h-6 flex items-center rounded-full p-1 cursor-pointer",
+                  notifications ? "bg-primary justify-end" : "bg-muted justify-start"
+                )}
+                onClick={() => handleNotificationToggle(!notifications)}
+              >
+                <div className="bg-white w-4 h-4 rounded-full shadow-md"></div>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -174,11 +183,15 @@ const Settings = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <Label htmlFor="sound-enabled">Enable Sound</Label>
-                <Switch
-                  id="sound-enabled"
-                  checked={soundEnabled}
-                  onCheckedChange={setSoundEnabled}
-                />
+                <div 
+                  className={cn(
+                    "w-12 h-6 flex items-center rounded-full p-1 cursor-pointer",
+                    soundEnabled ? "bg-primary justify-end" : "bg-muted justify-start"
+                  )}
+                  onClick={() => setSoundEnabled(!soundEnabled)}
+                >
+                  <div className="bg-white w-4 h-4 rounded-full shadow-md"></div>
+                </div>
               </div>
               {soundEnabled && (
                 <div className="space-y-3 pl-2">
