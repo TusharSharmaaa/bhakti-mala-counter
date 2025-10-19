@@ -3,30 +3,35 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Flame, Target, Calendar, Award } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { useCounter } from "@/hooks/useCounter";
+import { loadStreakData, StreakData } from "@/lib/streakSupabase";
+import { getStreakStatusMessage, getStreakEmoji } from "@/lib/streak";
+import ShareStreakButton from "@/components/ShareStreakButton";
 
 const Stats = () => {
   const { counter, loading } = useCounter();
-  const [streakData, setStreakData] = useState({ current_streak: 0, longest_streak: 0, total_malas: 0 });
+  const [streakData, setStreakData] = useState<StreakData | null>(null);
+  const [streakLoading, setStreakLoading] = useState(true);
 
   useEffect(() => {
-    loadStreakData();
+    loadStreakDataFromDB();
   }, []);
 
-  const loadStreakData = async () => {
-    // Calculate streaks from counter data
-    const totalMalas = Math.floor(counter.count / 108);
-    setStreakData({
-      current_streak: 0,
-      longest_streak: 0,
-      total_malas: totalMalas
-    });
+  const loadStreakDataFromDB = async () => {
+    try {
+      const data = await loadStreakData();
+      setStreakData(data);
+    } catch (error) {
+      console.error('Error loading streak data:', error);
+    } finally {
+      setStreakLoading(false);
+    }
   };
 
   const totalMalas = Math.floor(counter.count / 108);
   const todayMalas = Math.floor(counter.today_count / 108);
   const progressToday = Math.min(((counter.today_count % 108) / 108) * 100, 100);
 
-  if (loading) {
+  if (loading || streakLoading) {
     return (
       <div className="min-h-screen gradient-peaceful flex items-center justify-center">
         <p className="text-muted-foreground">Loading stats...</p>
@@ -90,13 +95,27 @@ const Stats = () => {
           </CardHeader>
           <CardContent>
             <div className="text-center">
-              <p className="text-6xl font-bold text-white mb-2">{streakData.current_streak}</p>
+              <p className="text-6xl font-bold text-white mb-2">
+                {streakData?.current_streak || 0}
+              </p>
               <p className="text-white/90">consecutive days</p>
-              {streakData.longest_streak > 0 && (
+              {streakData?.longest_streak && streakData.longest_streak > 0 && (
                 <p className="text-white/70 text-sm mt-2">
                   Best: {streakData.longest_streak} days
                 </p>
               )}
+              <p className="text-white/80 text-xs mt-3">
+                {getStreakStatusMessage(streakData?.current_streak || 0)}
+              </p>
+              
+              {/* Share Streak Button */}
+              <div className="mt-6">
+                <ShareStreakButton
+                  currentStreak={streakData?.current_streak || 0}
+                  longestStreak={streakData?.longest_streak || 0}
+                  totalMalas={streakData?.total_malas || totalMalas}
+                />
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -109,7 +128,7 @@ const Stats = () => {
               <Calendar className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{streakData.total_malas}</div>
+              <div className="text-3xl font-bold">{streakData?.total_malas || totalMalas}</div>
               <p className="text-xs text-muted-foreground mt-1">
                 {counter.count.toLocaleString()} total Jap
               </p>
@@ -123,10 +142,10 @@ const Stats = () => {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-primary">
-                {streakData.current_streak > 0 ? '🏆' : '💪'}
+                {getStreakEmoji(streakData?.current_streak || 0)}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                {streakData.current_streak > 0 ? 'Keep going!' : 'Start today!'}
+                {streakData?.current_streak && streakData.current_streak > 0 ? 'Keep going!' : 'Start today!'}
               </p>
             </CardContent>
           </Card>

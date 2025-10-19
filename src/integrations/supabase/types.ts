@@ -139,6 +139,7 @@ export type Database = {
           current_streak: number
           id: string
           last_jap_date: string | null
+          last_share_date: string | null
           longest_streak: number
           total_malas: number
           updated_at: string
@@ -149,6 +150,7 @@ export type Database = {
           current_streak?: number
           id?: string
           last_jap_date?: string | null
+          last_share_date?: string | null
           longest_streak?: number
           total_malas?: number
           updated_at?: string
@@ -159,6 +161,7 @@ export type Database = {
           current_streak?: number
           id?: string
           last_jap_date?: string | null
+          last_share_date?: string | null
           longest_streak?: number
           total_malas?: number
           updated_at?: string
