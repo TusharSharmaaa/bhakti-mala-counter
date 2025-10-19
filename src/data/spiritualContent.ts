@@ -26,39 +26,6 @@ export const maharajQuotes = [
   }
 ];
 
-export const gitaShlokas = [
-  {
-    verse: "कर्मण्येवाधिकारस्ते मा फलेषु कदाचन। मा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि॥",
-    translation: "You have a right to perform your prescribed duty, but you are not entitled to the fruits of action. Never consider yourself to be the cause of the results of your activities, and never be attached to not doing your duty.",
-    translationHindi: "तुम्हें केवल कर्म करने का अधिकार है, फल पर नहीं। न तुम कर्मफल के हेतु बनो और न तुम्हारी कर्म न करने में आसक्ति हो।",
-    chapter: "Bhagavad Gita 2.47"
-  },
-  {
-    verse: "यदा यदा हि धर्मस्य ग्लानिर्भवति भारत। अभ्युत्थानमधर्मस्य तदात्मानं सृजाम्यहम्॥",
-    translation: "Whenever there is a decline in righteousness and an increase in unrighteousness, O Arjuna, at that time I manifest myself on earth.",
-    translationHindi: "हे भारत! जब-जब धर्म की हानि और अधर्म की वृद्धि होती है, तब-तब मैं स्वयं को प्रकट करता हूँ।",
-    chapter: "Bhagavad Gita 4.7"
-  },
-  {
-    verse: "सर्वधर्मान्परित्यज्य मामेकं शरणं व्रज। अहं त्वां सर्वपापेभ्यो मोक्षयिष्यामि मा शुचः॥",
-    translation: "Abandon all varieties of dharma and just surrender unto Me. I shall deliver you from all sinful reactions. Do not fear.",
-    translationHindi: "सब धर्मों को त्यागकर केवल मेरी शरण में आ जाओ। मैं तुम्हें सभी पापों से मुक्त कर दूंगा, शोक मत करो।",
-    chapter: "Bhagavad Gita 18.66"
-  },
-  {
-    verse: "मन्मना भव मद्भक्तो मद्याजी मां नमस्कुरु। मामेवैष्यसि सत्यं ते प्रतिजाने प्रियोऽसि मे॥",
-    translation: "Always think of Me, become My devotee, worship Me and offer your homage unto Me. Thus you will come to Me without fail. I promise you this because you are My very dear friend.",
-    translationHindi: "मुझमें मन लगाओ, मेरे भक्त बनो, मेरी पूजा करो और मुझे नमस्कार करो। इस प्रकार तुम निश्चित रूप से मुझे प्राप्त होगे। मैं तुमसे सत्य प्रतिज्ञा करता हूँ क्योंकि तुम मुझे अत्यंत प्रिय हो।",
-    chapter: "Bhagavad Gita 18.65"
-  },
-  {
-    verse: "योगस्थः कुरु कर्माणि सङ्गं त्यक्त्वा धनञ्जय। सिद्ध्यसिद्ध्योः समो भूत्वा समत्वं योग उच्यते॥",
-    translation: "Perform your duty equipoised, O Arjuna, abandoning all attachment to success or failure. Such equanimity is called yoga.",
-    translationHindi: "हे धनंजय! आसक्ति को त्यागकर तथा सिद्धि और असिद्धि में समान बुद्धि वाले होकर योग में स्थित हुआ कर्तव्य कर्मों को कर। समत्व ही योग कहलाता है।",
-    chapter: "Bhagavad Gita 2.48"
-  }
-];
-
 export const hinduStories = [
   {
     title: "The Divine Love of Radha Krishna",
