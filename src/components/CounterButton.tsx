@@ -26,23 +26,37 @@ const CounterButton = ({ count, onCount, onMalaComplete, onUndo }: CounterButton
 
   // Pre-load and decode audio for low latency
   useEffect(() => {
-    if (!audioContextRef.current) {
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-      audioContextRef.current = new AudioContextClass();
-    }
+    const loadAudio = async () => {
+      if (!audioContextRef.current) {
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+        audioContextRef.current = new AudioContextClass();
+      }
 
-    // Decode short beep buffer (we'll use oscillator for now as a fallback)
-    const ctx = audioContextRef.current;
-    const sampleRate = ctx.sampleRate;
-    const duration = 0.08; // 80ms
-    const buffer = ctx.createBuffer(1, sampleRate * duration, sampleRate);
-    const data = buffer.getChannelData(0);
-    
-    for (let i = 0; i < buffer.length; i++) {
-      data[i] = Math.sin(2 * Math.PI * 800 * i / sampleRate) * Math.exp(-3 * i / buffer.length);
-    }
-    
-    audioBufferRef.current = buffer;
+      try {
+        // Load custom Radha sound
+        const response = await fetch('/icons/Radha_Name_Audio_ExtraSmooth_Fast (mp3cut.net).mp3');
+        const arrayBuffer = await response.arrayBuffer();
+        const audioBuffer = await audioContextRef.current.decodeAudioData(arrayBuffer);
+        audioBufferRef.current = audioBuffer;
+      } catch (error) {
+        console.error('Failed to load custom sound, using fallback:', error);
+        
+        // Fallback: Generate synthetic beep if custom sound fails to load
+        const ctx = audioContextRef.current;
+        const sampleRate = ctx.sampleRate;
+        const duration = 0.08;
+        const buffer = ctx.createBuffer(1, sampleRate * duration, sampleRate);
+        const data = buffer.getChannelData(0);
+        
+        for (let i = 0; i < buffer.length; i++) {
+          data[i] = Math.sin(2 * Math.PI * 800 * i / sampleRate) * Math.exp(-3 * i / buffer.length);
+        }
+        
+        audioBufferRef.current = buffer;
+      }
+    };
+
+    loadAudio();
   }, []);
 
   useEffect(() => {
