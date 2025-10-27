@@ -26,6 +26,8 @@ const SpiritualContent = () => {
   const [currentSlok, setCurrentSlok] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentChapter, setCurrentChapter] = useState(1);
+  const [currentVerse, setCurrentVerse] = useState(1);
 
   const getNextItem = (current: number, max: number) => (current + 1) % max;
   const getPrevItem = (current: number, max: number) => (current - 1 + max) % max;
@@ -47,8 +49,8 @@ const SpiritualContent = () => {
 
         setChapters(chaptersData);
         
-        // Load a random sloka on initial load
-        await loadRandomSloka(chaptersData);
+        // Load the first sloka on initial load
+        await loadSloka(1, 1, chaptersData);
       } catch (err) {
         console.error(err);
         setError("Failed to load Gita chapters. Please try again later.");
@@ -59,8 +61,8 @@ const SpiritualContent = () => {
     fetchChapters();
   }, []);
 
-  // --- Load Random Sloka ---
-  const loadRandomSloka = async (chaptersData?: any[]) => {
+  // --- Load Specific Sloka ---
+  const loadSloka = async (chapterNumber: number, verseNumber: number, chaptersData?: any[]) => {
     try {
       const chaptersToUse = chaptersData || chapters;
       
@@ -68,27 +70,36 @@ const SpiritualContent = () => {
         throw new Error("No chapters available");
       }
 
-      // Select random chapter
-      const randomChapter = chaptersToUse[Math.floor(Math.random() * chaptersToUse.length)];
+      // Find the specific chapter
+      const chapter = chaptersToUse.find(ch => 
+        (ch.chapter_number || ch.chapter || (chaptersToUse.indexOf(ch) + 1)) === chapterNumber
+      );
       
-      // Get the chapter number and verses count (handling different field name variations)
-      const chapterNumber = randomChapter.chapter_number || randomChapter.chapter || (chaptersToUse.indexOf(randomChapter) + 1);
-      const versesCount = randomChapter.verses_count || randomChapter.verses || randomChapter.slokas_count || 47; // Default fallback
+      if (!chapter) {
+        throw new Error(`Chapter ${chapterNumber} not found`);
+      }
+
+      // Get the verses count for this chapter
+      const versesCount = chapter.verses_count || chapter.verses || chapter.slokas_count || 47;
       
-      // Select random verse within that chapter
-      const randomVerse = Math.floor(Math.random() * versesCount) + 1;
+      // Validate verse number
+      if (verseNumber < 1 || verseNumber > versesCount) {
+        throw new Error(`Verse ${verseNumber} not found in Chapter ${chapterNumber}`);
+      }
 
       // Fetch the specific sloka
       const response = await axios.get(
-        `https://vedicscriptures.github.io/slok/${chapterNumber}/${randomVerse}`
+        `https://vedicscriptures.github.io/slok/${chapterNumber}/${verseNumber}`
       );
 
       setCurrentSlok({
         ...response.data,
         chapter: chapterNumber,
-        verse: randomVerse,
+        verse: verseNumber,
       });
       
+      setCurrentChapter(chapterNumber);
+      setCurrentVerse(verseNumber);
       setLoading(false);
     } catch (err) {
       console.error("Error loading sloka:", err);
@@ -97,10 +108,77 @@ const SpiritualContent = () => {
     }
   };
 
-  // --- Random Slokha Switcher ---
+  // --- Navigation Functions ---
+  const loadNextSloka = async () => {
+    setLoading(true);
+    const chaptersToUse = chapters;
+    
+    if (chaptersToUse.length === 0) return;
+    
+    const currentChapterData = chaptersToUse.find(ch => 
+      (ch.chapter_number || ch.chapter || (chaptersToUse.indexOf(ch) + 1)) === currentChapter
+    );
+    
+    if (!currentChapterData) return;
+    
+    const versesCount = currentChapterData.verses_count || currentChapterData.verses || currentChapterData.slokas_count || 47;
+    
+    if (currentVerse < versesCount) {
+      // Next verse in same chapter
+      await loadSloka(currentChapter, currentVerse + 1);
+    } else if (currentChapter < chaptersToUse.length) {
+      // First verse of next chapter
+      await loadSloka(currentChapter + 1, 1);
+    } else {
+      // Loop back to first chapter, first verse
+      await loadSloka(1, 1);
+    }
+  };
+
+  const loadPrevSloka = async () => {
+    setLoading(true);
+    const chaptersToUse = chapters;
+    
+    if (chaptersToUse.length === 0) return;
+    
+    if (currentVerse > 1) {
+      // Previous verse in same chapter
+      await loadSloka(currentChapter, currentVerse - 1);
+    } else if (currentChapter > 1) {
+      // Last verse of previous chapter
+      const prevChapterData = chaptersToUse.find(ch => 
+        (ch.chapter_number || ch.chapter || (chaptersToUse.indexOf(ch) + 1)) === currentChapter - 1
+      );
+      
+      if (prevChapterData) {
+        const versesCount = prevChapterData.verses_count || prevChapterData.verses || prevChapterData.slokas_count || 47;
+        await loadSloka(currentChapter - 1, versesCount);
+      }
+    } else {
+      // Loop to last chapter, last verse
+      const lastChapterData = chaptersToUse[chaptersToUse.length - 1];
+      const versesCount = lastChapterData.verses_count || lastChapterData.verses || lastChapterData.slokas_count || 47;
+      await loadSloka(chaptersToUse.length, versesCount);
+    }
+  };
+
   const showRandomSloka = async () => {
     setLoading(true);
-    await loadRandomSloka();
+    const chaptersToUse = chapters;
+    
+    if (chaptersToUse.length === 0) return;
+    
+    // Select random chapter
+    const randomChapter = chaptersToUse[Math.floor(Math.random() * chaptersToUse.length)];
+    
+    // Get the chapter number and verses count
+    const chapterNumber = randomChapter.chapter_number || randomChapter.chapter || (chaptersToUse.indexOf(randomChapter) + 1);
+    const versesCount = randomChapter.verses_count || randomChapter.verses || randomChapter.slokas_count || 47;
+    
+    // Select random verse within that chapter
+    const randomVerse = Math.floor(Math.random() * versesCount) + 1;
+    
+    await loadSloka(chapterNumber, randomVerse);
   };
 
   return (
@@ -242,7 +320,31 @@ const SpiritualContent = () => {
 
                   <div className="flex justify-between items-center">
                     <div className="flex gap-1">
-                      <Button variant="outline" size="icon" onClick={showRandomSloka} className="h-8 w-8 rounded-full">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={loadPrevSloka}
+                        className="h-8 w-8 rounded-full"
+                        disabled={loading}
+                      >
+                        <ArrowLeft className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={loadNextSloka}
+                        className="h-8 w-8 rounded-full"
+                        disabled={loading}
+                      >
+                        <ArrowRight className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="icon" 
+                        onClick={showRandomSloka} 
+                        className="h-8 w-8 rounded-full"
+                        disabled={loading}
+                      >
                         <RefreshCw className="h-4 w-4" />
                       </Button>
                     </div>
