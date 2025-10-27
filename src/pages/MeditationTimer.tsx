@@ -1,18 +1,41 @@
 import { useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
 import { Play, Pause, RotateCcw, Volume2, VolumeX } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { toast } from "sonner";
+import { MeditationAudioEngine, SoundType } from "@/lib/meditationAudio";
 
 const MeditationTimer = () => {
   const [duration, setDuration] = useState(5); // minutes
   const [timeLeft, setTimeLeft] = useState(duration * 60); // seconds
   const [isRunning, setIsRunning] = useState(false);
-  const [soundEnabled, setSoundEnabled] = useState(false);
-  const [backgroundSound, setBackgroundSound] = useState<'nature' | 'om' | 'water' | 'none'>('none');
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [backgroundSound, setBackgroundSound] = useState<SoundType>('om');
+  const [volume, setVolume] = useState(30);
   const intervalRef = useRef<number>();
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioEngineRef = useRef<MeditationAudioEngine | null>(null);
+
+  // Initialize audio engine
+  useEffect(() => {
+    try {
+      audioEngineRef.current = new MeditationAudioEngine();
+    } catch (error) {
+      console.warn('Failed to initialize audio engine:', error);
+      audioEngineRef.current = null;
+    }
+    
+    return () => {
+      if (audioEngineRef.current) {
+        try {
+          audioEngineRef.current.destroy();
+        } catch (error) {
+          console.warn('Error destroying audio engine:', error);
+        }
+      }
+    };
+  }, []);
 
   useEffect(() => {
     setTimeLeft(duration * 60);
@@ -42,8 +65,21 @@ const MeditationTimer = () => {
     };
   }, [isRunning]);
 
+  // Update volume when changed
+  useEffect(() => {
+    try {
+      if (audioEngineRef.current) {
+        audioEngineRef.current.setVolume(volume / 100);
+      }
+    } catch (error) {
+      console.warn('Failed to set volume:', error);
+    }
+  }, [volume]);
+
   const handleComplete = () => {
     setIsRunning(false);
+    stopBackgroundSound();
+    
     toast.success("🧘 Meditation Complete!", {
       description: "Radhe Radhe! Your meditation session is complete.",
       duration: 5000,
@@ -79,8 +115,10 @@ const MeditationTimer = () => {
   };
 
   const handlePlayPause = () => {
-    setIsRunning(!isRunning);
-    if (!isRunning && soundEnabled && backgroundSound !== 'none') {
+    const newRunningState = !isRunning;
+    setIsRunning(newRunningState);
+    
+    if (newRunningState && soundEnabled && backgroundSound !== 'none') {
       playBackgroundSound();
     } else {
       stopBackgroundSound();
@@ -94,17 +132,39 @@ const MeditationTimer = () => {
   };
 
   const playBackgroundSound = () => {
-    if (backgroundSound !== 'none') {
-      const utterance = new SpeechSynthesisUtterance("Om");
-      utterance.rate = 0.5;
-      utterance.pitch = 0.8;
-      utterance.volume = 0.3;
-      window.speechSynthesis.speak(utterance);
+    try {
+      if (audioEngineRef.current && backgroundSound !== 'none') {
+        audioEngineRef.current.play(backgroundSound);
+      }
+    } catch (error) {
+      console.warn('Failed to play background sound:', error);
     }
   };
 
   const stopBackgroundSound = () => {
-    window.speechSynthesis.cancel();
+    try {
+      if (audioEngineRef.current) {
+        audioEngineRef.current.stop();
+      }
+    } catch (error) {
+      console.warn('Failed to stop background sound:', error);
+    }
+  };
+
+  const handleSoundTypeChange = (newSound: SoundType) => {
+    setBackgroundSound(newSound);
+    
+    // If timer is running, switch sound immediately
+    if (isRunning && soundEnabled) {
+      stopBackgroundSound();
+      if (newSound !== 'none') {
+        setTimeout(() => {
+          if (audioEngineRef.current) {
+            audioEngineRef.current.play(newSound);
+          }
+        }, 100);
+      }
+    }
   };
 
   const formatTime = (seconds: number) => {
@@ -217,43 +277,87 @@ const MeditationTimer = () => {
                 onClick={() => setSoundEnabled(!soundEnabled)}
               >
                 {soundEnabled ? (
-                  <Volume2 className="h-5 w-5" />
+                  <Volume2 className="h-5 w-5 text-primary" />
                 ) : (
                   <VolumeX className="h-5 w-5" />
                 )}
               </Button>
             </div>
+            
             {soundEnabled && (
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  variant={backgroundSound === 'om' ? 'default' : 'outline'}
-                  onClick={() => setBackgroundSound('om')}
-                  size="sm"
-                >
-                  OM Chanting
-                </Button>
-                <Button
-                  variant={backgroundSound === 'nature' ? 'default' : 'outline'}
-                  onClick={() => setBackgroundSound('nature')}
-                  size="sm"
-                >
-                  Birds
-                </Button>
-                <Button
-                  variant={backgroundSound === 'water' ? 'default' : 'outline'}
-                  onClick={() => setBackgroundSound('water')}
-                  size="sm"
-                >
-                  Water Stream
-                </Button>
-                <Button
-                  variant={backgroundSound === 'none' ? 'default' : 'outline'}
-                  onClick={() => setBackgroundSound('none')}
-                  size="sm"
-                >
-                  Silent
-                </Button>
-              </div>
+              <>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    variant={backgroundSound === 'om' ? 'default' : 'outline'}
+                    onClick={() => handleSoundTypeChange('om')}
+                    size="sm"
+                  >
+                    🕉️ OM Chanting
+                  </Button>
+                  <Button
+                    variant={backgroundSound === 'nature' ? 'default' : 'outline'}
+                    onClick={() => handleSoundTypeChange('nature')}
+                    size="sm"
+                  >
+                    🐦 Birds
+                  </Button>
+                  <Button
+                    variant={backgroundSound === 'water' ? 'default' : 'outline'}
+                    onClick={() => handleSoundTypeChange('water')}
+                    size="sm"
+                  >
+                    💧 Water
+                  </Button>
+                  <Button
+                    variant={backgroundSound === 'flute' ? 'default' : 'outline'}
+                    onClick={() => handleSoundTypeChange('flute')}
+                    size="sm"
+                  >
+                    🎵 Flute
+                  </Button>
+                  <Button
+                    variant={backgroundSound === 'bell' ? 'default' : 'outline'}
+                    onClick={() => handleSoundTypeChange('bell')}
+                    size="sm"
+                  >
+                    🔔 Bell
+                  </Button>
+                  <Button
+                    variant={backgroundSound === 'none' ? 'default' : 'outline'}
+                    onClick={() => handleSoundTypeChange('none')}
+                    size="sm"
+                  >
+                    🔇 Silent
+                  </Button>
+                </div>
+
+                {/* Volume Control */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-muted-foreground">Volume</p>
+                    <p className="text-xs font-medium">{volume}%</p>
+                  </div>
+                  <Slider
+                    value={[volume]}
+                    onValueChange={(value) => setVolume(value[0])}
+                    max={100}
+                    step={5}
+                    className="w-full"
+                  />
+                </div>
+
+                {/* Sound Description */}
+                <div className="bg-primary/5 p-3 rounded-lg border border-primary/10">
+                  <p className="text-xs text-muted-foreground text-center">
+                    {backgroundSound === 'om' && 'Deep meditative OM drone - calms the mind'}
+                    {backgroundSound === 'nature' && 'Peaceful bird chirping - connects with nature'}
+                    {backgroundSound === 'water' && 'Flowing stream - washing away thoughts'}
+                    {backgroundSound === 'flute' && 'Spiritual flute melody - transcends the soul'}
+                    {backgroundSound === 'bell' && 'Temple bells - brings divine presence'}
+                    {backgroundSound === 'none' && 'Complete silence - for deep meditation'}
+                  </p>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>

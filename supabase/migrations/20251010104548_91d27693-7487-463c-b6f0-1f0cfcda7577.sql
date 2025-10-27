@@ -72,6 +72,7 @@ CREATE TABLE public.streaks (
   current_streak INTEGER DEFAULT 0 NOT NULL CHECK (current_streak >= 0),
   longest_streak INTEGER DEFAULT 0 NOT NULL CHECK (longest_streak >= 0),
   last_jap_date DATE,
+  last_share_date DATE,
   total_malas INTEGER DEFAULT 0 NOT NULL CHECK (total_malas >= 0),
   created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT now() NOT NULL

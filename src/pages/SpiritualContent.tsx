@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Heart, BookOpen, Sparkles, Share2, RefreshCw, ArrowLeft, ArrowRight } from "lucide-react";
 import { maharajQuotes, hinduStories } from "@/data/spiritualContent";
 import Navigation from "@/components/Navigation";
+import WhatsAppShareButton from "@/components/WhatsAppShareButton";
 import maharajImage from "@/assets/maharaj-ji.jpg";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -28,15 +29,6 @@ const SpiritualContent = () => {
 
   const getNextItem = (current: number, max: number) => (current + 1) % max;
   const getPrevItem = (current: number, max: number) => (current - 1 + max) % max;
-
-  // --- WhatsApp Share ---
-  const shareToWhatsApp = (text: string, type: string) => {
-    const appLink = "\n\n📱 Download Radha Naam Jap Counter:\nhttps://play.google.com/store/apps/details?id=com.bhaktimala.counter";
-    const message = `${text}\n\n— Shri Premanand Maharaj Ji\n🙏 Radhe Radhe${appLink}`;
-    const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-    window.open(url, "_blank");
-    toast.success("Opening WhatsApp...");
-  };
 
   // --- Fetch Chapters Info ---
   useEffect(() => {
@@ -199,14 +191,10 @@ const SpiritualContent = () => {
                         <RefreshCw className="h-4 w-4" />
                       </Button>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => shareToWhatsApp(showHindi ? currentQuote.quoteHindi : currentQuote.quote, "quote")}
-                      className="gap-2"
-                    >
-                      <Share2 className="h-4 w-4" /> Share on WhatsApp
-                    </Button>
+                    <WhatsAppShareButton
+                      content={showHindi ? currentQuote.quoteHindi : currentQuote.quote}
+                      title="Divine Wisdom - Shri Premanand Maharaj"
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -258,20 +246,15 @@ const SpiritualContent = () => {
                         <RefreshCw className="h-4 w-4" />
                       </Button>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        const translation = showHindi
-                          ? currentSlok?.raman?.ht || currentSlok?.siva?.ht || currentSlok?.gambir?.ht || currentSlok?.tej?.ht
-                          : currentSlok?.tej?.et || currentSlok?.siva?.et || currentSlok?.gambir?.et || currentSlok?.purohit?.et;
-                        const message = `🕉️ Bhagavad Gita ${currentSlok?.chapter}:${currentSlok?.verse}\n\n${currentSlok?.slok}\n\n${translation || ""}`;
-                        shareToWhatsApp(message, "gita");
-                      }}
-                      className="gap-2"
-                    >
-                      <Share2 className="h-4 w-4" /> Share on WhatsApp
-                    </Button>
+                    {currentSlok && (
+                      <WhatsAppShareButton
+                        content={`🕉️ Bhagavad Gita ${currentSlok.chapter}:${currentSlok.verse}\n\n${currentSlok.slok}\n\n${showHindi 
+                          ? currentSlok.raman?.ht || currentSlok.siva?.ht || currentSlok.gambir?.ht || currentSlok.tej?.ht || ""
+                          : currentSlok.tej?.et || currentSlok.siva?.et || currentSlok.gambir?.et || currentSlok.purohit?.et || currentSlok.raman?.et || ""
+                        }`}
+                        title={`Chapter ${currentSlok.chapter} - Bhagavad Gita`}
+                      />
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -329,19 +312,10 @@ const SpiritualContent = () => {
                         <RefreshCw className="h-4 w-4" />
                       </Button>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() =>
-                        shareToWhatsApp(
-                          `${showHindi ? currentStory.titleHindi : currentStory.title}\n\n${showHindi ? currentStory.storyHindi : currentStory.story}\n\n${showHindi ? "सीख:" : "Moral:"} ${showHindi ? currentStory.moralHindi : currentStory.moral}`,
-                          "story"
-                        )
-                      }
-                      className="gap-2"
-                    >
-                      <Share2 className="h-4 w-4" /> Share on WhatsApp
-                    </Button>
+                    <WhatsAppShareButton
+                      content={`${showHindi ? currentStory.titleHindi : currentStory.title}\n\n${showHindi ? currentStory.storyHindi : currentStory.story}\n\n${showHindi ? 'सीख:' : 'Moral:'} ${showHindi ? currentStory.moralHindi : currentStory.moral}`}
+                      title="Hindu Spiritual Story"
+                    />
                   </div>
                 </CardContent>
               </Card>
