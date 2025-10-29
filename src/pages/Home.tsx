@@ -1,12 +1,9 @@
 import CounterButton from "@/components/CounterButton";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Settings as SettingsIcon, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
 import { useCounter } from "@/hooks/useCounter";
 import { useWakeLock } from "@/hooks/useWakeLock";
-import Settings from "@/pages/Settings";
 
 const Home = () => {
   const { counter, loading: counterLoading, increment, decrement, reset } = useCounter();
@@ -49,74 +46,73 @@ const Home = () => {
     );
   }
 
+  // Global tap handler: tap anywhere increments, except interactive elements
+  const handleGlobalTap: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    const target = e.target as HTMLElement;
+    // Ignore taps on buttons, links, inputs, and inside the counter button
+    if (target.closest('button, a, input, textarea, [role="button"], [data-no-global-tap], #counter-button')) {
+      return;
+    }
+    // Fire sound event for global taps
+    window.dispatchEvent(new Event('play-tap-sound'));
+    handleCount();
+  };
+
   return (
-    <div className="min-h-screen gradient-peaceful relative overflow-hidden pb-40 safe-padding">
+    <div
+      className="min-h-screen gradient-peaceful relative overflow-hidden pb-40 safe-padding"
+      onClick={handleGlobalTap}
+      style={{
+        backgroundImage: "linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.6)), url(/images/background-Image.png)",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
       {/* Compact Header */}
       <header className="border-b border-border/50 backdrop-blur-sm bg-background/50">
-        <div className="container mx-auto px-4 py-3">
+        <div className="container mx-auto px-4 py-2 sm:py-3" data-no-global-tap>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full gradient-divine flex items-center justify-center shadow-divine">
-                <Sparkles className="h-4 w-4 text-white" />
+              <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full gradient-divine flex items-center justify-center shadow-divine">
+                <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-primary">Radha Naam Jap</h1>
+                <h1 className="text-lg sm:text-xl font-bold text-primary">Radha Naam Jap</h1>
               </div>
-            </div>
-            <div className="flex gap-2">
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    className="h-10 w-10 rounded-full"
-                    aria-label="Open settings"
-                  >
-                    <SettingsIcon className="h-5 w-5" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent>
-                  <SheetHeader>
-                    <SheetTitle>Settings</SheetTitle>
-                  </SheetHeader>
-                  <div className="mt-6">
-                    <Settings />
-                  </div>
-                </SheetContent>
-              </Sheet>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 space-y-8">
+      <main className="container mx-auto px-4 py-4 sm:py-6 md:py-8 space-y-4 sm:space-y-6 md:space-y-8">
         {/* Quick Stats with Enhanced Interactivity */}
-        <div className="grid grid-cols-3 gap-3 text-center">
-          <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:scale-105 cursor-pointer group">
-            <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-              <img src="/images/today.jpg" alt="Mala" className="w-10 h-10 object-contain" />
+        <div className="grid grid-cols-3 gap-2 sm:gap-3 text-center">
+          <div className="bg-card/50 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:scale-105 cursor-pointer group">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+              <img src="/images/Gemini_Generated_Image_ofn47sofn47sofn4 (1).png" alt="Mala" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
             </div>
-            <p className="text-xs text-muted-foreground mb-1">Today</p>
-            <p className="text-3xl font-bold text-primary">{counter.today_count}</p>
+            <p className="text-xs text-muted-foreground mb-1">Today's Jap</p>
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-primary">{counter.today_count}</p>
           </div>
-          <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50 hover:border-accent/50 transition-all hover:shadow-lg hover:scale-105 cursor-pointer group">
-            <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
-              <img src="/images/Mala.jpg" alt="Mala" className="w-8 h-8 object-contain" />
+          <div className="bg-card/50 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 border border-border/50 hover:border-accent/50 transition-all hover:shadow-lg hover:scale-105 cursor-pointer group">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2 rounded-full bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
+              <img src="/images/Gemini_Generated_Image_sxyq38sxyq38sxyq.png" alt="Mala" className="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
             </div>
             <p className="text-xs text-muted-foreground mb-1">Malas</p>
-            <p className="text-3xl font-bold text-accent">{malas}</p>
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-accent">{malas}</p>
           </div>
-          <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50 hover:border-secondary/50 transition-all hover:shadow-lg hover:scale-105 cursor-pointer group">
-            <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-secondary/10 flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
-               <img src="/images/Total_order_quantity_AI.png" alt="Mala" className="w-10 h-10 object-contain" />
+          <div className="bg-card/50 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 border border-border/50 hover:border-secondary/50 transition-all hover:shadow-lg hover:scale-105 cursor-pointer group">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2 rounded-full bg-secondary/10 flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
+               <img src="/images/Gemini_Generated_Image_8e5j1n8e5j1n8e5j.png" alt="Mala" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
             </div>
-            <p className="text-xs text-muted-foreground mb-1">Total</p>
-            <p className="text-3xl font-bold text-secondary">{counter.count}</p>
+            <p className="text-xs text-muted-foreground mb-1">Lifetime Jap</p>
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-secondary">{counter.count}</p>
           </div>
         </div>
 
         {/* Counter Section */}
-        <div className="flex justify-center py-8">
+        <div className="flex justify-center py-4 sm:py-6 md:py-8">
           <CounterButton 
             count={counter.count} 
             onCount={handleCount}
@@ -126,17 +122,17 @@ const Home = () => {
         </div>
 
         {/* Footer Quote */}
-        <div className="text-center space-y-2 mb-20 pt-2">
-          <p className="text-sm text-muted-foreground italic">
+        <div className="text-center space-y-1 sm:space-y-2 mb-16 sm:mb-20 pt-2 px-4">
+          <p className="text-xs sm:text-sm font-bold text-muted-foreground italic">
             "राधे राधे - The sweetest name in all the universes"
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs font-bold text-muted-foreground">
             Inspired by the teachings of Shri Premanand Maharaj Ji
           </p>
         </div>
       </main>
 
-      <div className="pb-16">
+      <div className="pb-16" data-no-global-tap>
         <Navigation />
       </div>
     </div>

@@ -50,140 +50,83 @@ const ShareStreakButton = ({ currentStreak, longestStreak, totalMalas }: ShareSt
   };
 
   const handleDirectShare = async () => {
-    if (!generatedImage) return;
+    if (!generatedImage) {
+      toast.error("No image generated yet. Please generate an image first.");
+      return;
+    }
+
+    console.log('Starting share process...', { generatedImage: !!generatedImage });
 
     try {
       // Create share text
       const shareText = `🔥 ${currentStreak} Days of Devotion! 🔥\n\n${getMotivationalQuote(currentStreak)}\n\n🏆 Best Streak: ${longestStreak} days\n📿 Total Malas: ${totalMalas}\n🔥 Current: ${currentStreak} days\n\nKeep chanting with devotion! 🙏\n\n#BhaktiMalaCounter #RadhaNaamJap #SpiritualJourney`;
       
+      console.log('Fetching image blob...');
       // Convert image to blob
       const response = await fetch(generatedImage);
       const blob = await response.blob();
       const file = new File([blob], `streak-${currentStreak}-days-devotion.png`, { type: 'image/png' });
       
-      // Method 1: Try Web Share API with files (most reliable)
-      if (navigator.share && navigator.canShare) {
+      console.log('Blob created:', { size: blob.size, type: blob.type });
+
+      // Check if native sharing is supported
+      const canShareFiles = navigator.share && navigator.canShare && navigator.canShare({ files: [file] });
+      console.log('Native share support:', { 
+        hasShare: !!navigator.share, 
+        hasCanShare: !!navigator.canShare, 
+        canShareFiles 
+      });
+
+      // Try native Web Share API with files first
+      if (canShareFiles) {
         try {
-          if (navigator.canShare({ files: [file] })) {
-            await navigator.share({
-              text: shareText,
-              files: [file],
-              title: `${currentStreak} Days of Devotion`,
-            });
-            
-            toast.success("Streak shared directly! 📱", {
-              description: `Your ${currentStreak} days of devotion has been shared with image!`,
-              duration: 4000,
-            });
-            setShowImageModal(false);
-            return;
-          }
+          console.log('Attempting native share...');
+          await navigator.share({
+            files: [file],
+            text: shareText,
+            title: `${currentStreak} Days of Devotion`,
+          });
+          console.log('Native share successful');
+          toast.success("Image shared successfully! 📱");
+          setShowImageModal(false);
+          return;
         } catch (shareError) {
-          console.log('Web Share API with files failed:', shareError);
+          console.log('Native share failed:', shareError);
+          // Fall through to download method
         }
       }
+
+      console.log('Falling back to download method...');
       
-      // Method 2: Try to copy image to clipboard and open WhatsApp
-      try {
-        // Copy image to clipboard
-        await navigator.clipboard.write([
-          new ClipboardItem({
-            'image/png': blob
-          })
-        ]);
-        
-        // Open WhatsApp with text
-        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
-        window.open(whatsappUrl, '_blank');
-        
-        toast.success("Image copied! Paste in WhatsApp 📱", {
-          description: "Image copied to clipboard. In WhatsApp, paste the image (Ctrl+V or long press → paste) to share with text!",
-          duration: 8000,
-        });
-        setShowImageModal(false);
-        return;
-        
-      } catch (clipboardError) {
-        console.log('Clipboard copy failed:', clipboardError);
-      }
+      // If native share not supported or failed, download the image
+      const link = document.createElement('a');
+      link.href = generatedImage;
+      link.download = `streak-${currentStreak}-days-devotion.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       
-      // Method 3: Try to use a temporary image element and copy to clipboard
+      console.log('Image download triggered');
+      
+      toast.success("Image downloaded! 📱", {
+        description: "You can now share this image manually in WhatsApp or any other app",
+        duration: 4000,
+      });
+      
+      // Also try to open WhatsApp with text
+      const whatsappUrl = (isMobile ? 'whatsapp://send?text=' : 'https://wa.me/?text=') + encodeURIComponent(shareText);
+      console.log('Opening WhatsApp:', whatsappUrl);
+      
       try {
-        // Create a temporary image element
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        
-        img.onload = async () => {
-          // Create canvas to convert to blob
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          canvas.width = img.width;
-          canvas.height = img.height;
-          
-          if (ctx) {
-            ctx.drawImage(img, 0, 0);
-            
-            // Convert to blob
-            canvas.toBlob(async (blob) => {
-              if (blob) {
-                try {
-                  // Try to copy to clipboard again
-                  await navigator.clipboard.write([
-                    new ClipboardItem({
-                      'image/png': blob
-                    })
-                  ]);
-                  
-                  // Open WhatsApp
-                  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
-                  window.open(whatsappUrl, '_blank');
-                  
-                  toast.success("Image copied! Paste in WhatsApp 📱", {
-                    description: "Image copied to clipboard. Paste it in WhatsApp along with the text!",
-                    duration: 8000,
-                  });
-                  setShowImageModal(false);
-                  
-                } catch (finalError) {
-                  // Final fallback: just share text and download image
-                  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
-                  window.open(whatsappUrl, '_blank');
-                  
-                  // Download image
-                  const link = document.createElement('a');
-                  link.href = generatedImage;
-                  link.download = `streak-${currentStreak}-days-devotion.png`;
-                  link.click();
-                  
-                  toast.success("WhatsApp opened! Image downloaded 📱", {
-                    description: "Share the downloaded image manually in WhatsApp",
-                    duration: 5000,
-                  });
-                }
-              }
-            }, 'image/png');
-          }
-        };
-        
-        img.src = generatedImage;
-        
-      } catch (error) {
-        console.log('Image processing failed:', error);
-        
-        // Final fallback: just share text and download image
-        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
-        window.open(whatsappUrl, '_blank');
-        
-        // Download image
-        const link = document.createElement('a');
-        link.href = generatedImage;
-        link.download = `streak-${currentStreak}-days-devotion.png`;
-        link.click();
-        
-        toast.success("WhatsApp opened! Image downloaded 📱", {
-          description: "Share the downloaded image manually in WhatsApp",
-          duration: 5000,
-        });
+        const newWindow = window.open(whatsappUrl, '_blank');
+        if (!newWindow) {
+          throw new Error('Popup blocked');
+        }
+      } catch (e) {
+        console.log('Window.open failed, trying location.href');
+        if (isMobile) {
+          window.location.href = whatsappUrl;
+        }
       }
       
     } catch (error) {
@@ -271,17 +214,7 @@ const ShareStreakButton = ({ currentStreak, longestStreak, totalMalas }: ShareSt
             </div>
             
             {/* Device-specific instructions */}
-            <div className="text-center text-sm text-muted-foreground space-y-2">
-              <p><strong>📱 How to Share Image + Text:</strong></p>
-              <p>1. Tap "Share Directly" button</p>
-              <p>2. Image copied to clipboard</p>
-              <p>3. WhatsApp opens with text</p>
-              <p>4. Paste image (Ctrl+V or long press → paste)</p>
-              <p>5. Send both together!</p>
-              <p className="text-xs text-muted-foreground mt-2">
-                If clipboard fails, image will download automatically
-              </p>
-            </div>
+            
           </div>
         </DialogContent>
       </Dialog>

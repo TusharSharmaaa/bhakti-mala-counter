@@ -3,9 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Flame, Target, Calendar, Award } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { useCounter } from "@/hooks/useCounter";
-import { loadStreakData, StreakData } from "@/lib/streakSupabase";
+import { loadStreakData } from "@/lib/streakSupabase";
+import { StreakData } from "@/lib/streak";
 import { getStreakStatusMessage, getStreakEmoji } from "@/lib/streak";
 import ShareStreakButton from "@/components/ShareStreakButton";
+import ProgressCalendar from "@/components/ProgressCalendar";
 
 const Stats = () => {
   const { counter, loading } = useCounter();
@@ -150,6 +152,9 @@ const Stats = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Progress Calendar */}
+        <ProgressCalendar />
 
         {/* Motivational Quote */}
         <Card className="shadow-soft border-border/50 bg-primary/5">

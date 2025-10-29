@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { loadCounter, saveCounter, resetCounter as resetCounterStorage, CounterData } from '@/lib/storage';
+import { saveDailyProgress } from '@/lib/dailyProgress';
 
 export function useCounter() {
   const [counter, setCounter] = useState<CounterData>({
@@ -23,6 +24,13 @@ export function useCounter() {
       }
       
       setCounter(data);
+      
+      // Save today's progress to database if there's any
+      if (data.today_count > 0) {
+        const malasCompleted = Math.floor(data.today_count / 108);
+        await saveDailyProgress(today, data.today_count, malasCompleted);
+      }
+      
       setLoading(false);
     };
     
@@ -39,6 +47,10 @@ export function useCounter() {
     
     setCounter(newData);
     await saveCounter(newData);
+    
+    // Save daily progress to database
+    const malasCompleted = Math.floor(newData.today_count / 108);
+    await saveDailyProgress(today, newData.today_count, malasCompleted);
   };
 
   const decrement = async () => {
@@ -52,6 +64,11 @@ export function useCounter() {
     
     setCounter(newData);
     await saveCounter(newData);
+    
+    // Save daily progress to database
+    const today = new Date().toISOString().split('T')[0];
+    const malasCompleted = Math.floor(newData.today_count / 108);
+    await saveDailyProgress(today, newData.today_count, malasCompleted);
   };
 
   const reset = async () => {

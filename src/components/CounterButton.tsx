@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Volume2, VolumeX } from "lucide-react";
 import { calculateProgress } from "@/lib/counter";
 
 interface CounterButtonProps {
@@ -67,6 +68,10 @@ const CounterButton = ({ count, onCount, onMalaComplete, onUndo }: CounterButton
     if (!soundEnabled || !audioContextRef.current || !audioBufferRef.current) return;
     
     try {
+      // Ensure context is running (mobile browsers can suspend it)
+      if (audioContextRef.current.state === 'suspended') {
+        audioContextRef.current.resume().catch(() => {});
+      }
       const source = audioContextRef.current.createBufferSource();
       source.buffer = audioBufferRef.current;
       const gainNode = audioContextRef.current.createGain();
@@ -81,6 +86,7 @@ const CounterButton = ({ count, onCount, onMalaComplete, onUndo }: CounterButton
 
   const handlePointerDown = (e: React.PointerEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     
     // Play audio immediately on pointerdown for lowest latency
     playTapSound();
@@ -94,7 +100,8 @@ const CounterButton = ({ count, onCount, onMalaComplete, onUndo }: CounterButton
     }, 1500);
   };
 
-  const handlePointerUp = () => {
+  const handlePointerUp = (e?: React.PointerEvent) => {
+    if (e) e.stopPropagation();
     if (resetTimerRef.current) {
       clearTimeout(resetTimerRef.current);
       resetTimerRef.current = null;
@@ -159,6 +166,15 @@ const CounterButton = ({ count, onCount, onMalaComplete, onUndo }: CounterButton
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showUndo, count]);
 
+  // Listen for global tap sound requests
+  useEffect(() => {
+    const handler = () => {
+      playTapSound();
+    };
+    window.addEventListener('play-tap-sound', handler as EventListener);
+    return () => window.removeEventListener('play-tap-sound', handler as EventListener);
+  }, [soundEnabled]);
+
   // Cleanup timers
   useEffect(() => {
     return () => {
@@ -171,26 +187,35 @@ const CounterButton = ({ count, onCount, onMalaComplete, onUndo }: CounterButton
     <div className="relative flex flex-col items-center gap-6">
       {/* Single Filled Circle with White Progress Border */}
       <div className="relative">
+        {/* Mute toggle - positioned just outside the circle */}
+        <button
+          onClick={(e) => { e.stopPropagation(); setSoundEnabled((v) => !v); }}
+          aria-label={soundEnabled ? 'Mute tap sound' : 'Unmute tap sound'}
+          className="absolute -top-3 -right-3 z-10 h-10 w-10 rounded-full bg-background/70 backdrop-blur border border-border shadow-soft flex items-center justify-center hover:bg-background transition-colors"
+          title={soundEnabled ? 'Mute' : 'Unmute'}
+        >
+          {soundEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+        </button>
         {/* White Progress Ring - Outer Border */}
-        <svg className="absolute inset-0 w-80 h-80 transform -rotate-90" style={{ filter: 'drop-shadow(0 0 20px rgba(255,255,255,0.3))' }}>
+        <svg className="absolute inset-0 w-full h-full transform -rotate-90" style={{ filter: 'drop-shadow(0 0 20px rgba(255,255,255,0.3))' }}>
           <circle
-            cx="160"
-            cy="160"
-            r="152"
+            cx="50%"
+            cy="50%"
+            r="47.5%"
             fill="none"
             stroke="rgba(255, 255, 255, 0.2)"
-            strokeWidth="6"
+            strokeWidth="1.875%"
           />
           <circle
-            cx="160"
-            cy="160"
-            r="152"
+            cx="50%"
+            cy="50%"
+            r="47.5%"
             fill="none"
             stroke="white"
-            strokeWidth="6"
+            strokeWidth="1.875%"
             strokeLinecap="round"
-            strokeDasharray={`${2 * Math.PI * 152}`}
-            strokeDashoffset={`${2 * Math.PI * 152 * (1 - progress)}`}
+            strokeDasharray={`${2 * Math.PI * 47.5}`}
+            strokeDashoffset={`${2 * Math.PI * 47.5 * (1 - progress)}`}
             className="transition-all duration-300"
             style={{ filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.8))' }}
           />
@@ -198,13 +223,16 @@ const CounterButton = ({ count, onCount, onMalaComplete, onUndo }: CounterButton
 
         {/* Main Filled Counter Button - Single Interactive Circle */}
         <button
+          id="counter-button"
           onPointerDown={handlePointerDown}
-          onPointerUp={handlePointerUp}
-          onPointerLeave={handlePointerUp}
-          onClick={handleClick}
+          onPointerUp={(e) => handlePointerUp(e)}
+          onPointerLeave={(e) => handlePointerUp(e)}
+          onClick={(e) => { e.stopPropagation(); handleClick(); }}
           aria-label={`Count ${currentMalaCount} of 108. Press to increment.`}
-          className={`counter-btn relative w-80 h-80 min-h-[280px] rounded-full gradient-divine shadow-divine
-            flex flex-col items-center justify-center gap-2
+          className={`counter-btn relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-96 lg:h-96 
+            min-h-[200px] sm:min-h-[240px] md:min-h-[280px] lg:min-h-[320px]
+            rounded-full gradient-divine shadow-divine
+            flex flex-col items-center justify-center gap-1 sm:gap-2
             transition-all duration-150 overflow-hidden select-none
             ${isPressed ? 'scale-95 shadow-2xl' : 'scale-100 hover:scale-[1.02] active:scale-95'}
             ${isResetting ? 'opacity-50' : ''}`}
@@ -223,23 +251,23 @@ const CounterButton = ({ count, onCount, onMalaComplete, onUndo }: CounterButton
           )}
           
           {/* Counter Content */}
-          <span className="text-white/90 text-sm font-semibold tracking-widest uppercase pointer-events-none animate-pulse">
+          <span className="text-white/90 text-xs sm:text-sm font-semibold tracking-widest uppercase pointer-events-none animate-pulse">
             ॐ राधा राधा ॐ
           </span>
-          <span className="text-white text-8xl font-bold tracking-tight pointer-events-none drop-shadow-lg">
+          <span className="text-white text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight pointer-events-none drop-shadow-lg">
             {currentMalaCount}
           </span>
-          <div className="flex items-center gap-2 pointer-events-none">
-            <div className="w-1.5 h-1.5 rounded-full bg-white/60 animate-pulse" />
-            <span className="text-white/80 text-sm tracking-wider font-medium">
+          <div className="flex items-center gap-1 sm:gap-2 pointer-events-none">
+            <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-white/60 animate-pulse" />
+            <span className="text-white/80 text-xs sm:text-sm tracking-wider font-medium">
               {Math.floor(count / 108)} Mala{Math.floor(count / 108) !== 1 ? 's' : ''}
             </span>
-            <div className="w-1.5 h-1.5 rounded-full bg-white/60 animate-pulse" />
+            <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-white/60 animate-pulse" />
           </div>
           
           {isResetting && (
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 pointer-events-none">
-              <span className="text-white text-xs font-medium bg-white/20 px-4 py-1.5 rounded-full backdrop-blur-sm">
+            <div className="absolute bottom-4 sm:bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 pointer-events-none">
+              <span className="text-white text-xs font-medium bg-white/20 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full backdrop-blur-sm">
                 Hold to reset...
               </span>
             </div>
@@ -251,8 +279,9 @@ const CounterButton = ({ count, onCount, onMalaComplete, onUndo }: CounterButton
       {showUndo && onUndo && (
         <button
           onClick={handleUndo}
-          className="px-6 py-2 rounded-full bg-secondary text-secondary-foreground
-            shadow-soft hover:bg-secondary/80 transition-smooth min-h-[48px]
+          className="px-4 sm:px-6 py-2 rounded-full bg-secondary text-secondary-foreground
+            shadow-soft hover:bg-secondary/80 transition-smooth min-h-[40px] sm:min-h-[48px]
+            text-sm sm:text-base
             animate-in fade-in slide-in-from-bottom-2 duration-200"
           aria-label="Undo last increment"
         >
@@ -261,11 +290,11 @@ const CounterButton = ({ count, onCount, onMalaComplete, onUndo }: CounterButton
       )}
 
       {/* Progress Info */}
-      <div className="text-center space-y-1">
-        <p className="text-sm text-muted-foreground">
+      <div className="text-center font-bold space-y-1 px-4">
+        <p className="text-xs sm:text-sm font-bold text-muted-foreground">
           {remaining} more to complete this mala
         </p>
-        <p className="text-xs text-muted-foreground/70">
+        <p className="text-xs font-bold text-muted-foreground/70">
           Progress: {percentage}%
         </p>
       </div>

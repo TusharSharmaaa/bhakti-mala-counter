@@ -6,7 +6,7 @@ import { Heart, BookOpen, Sparkles, Share2, RefreshCw, ArrowLeft, ArrowRight } f
 import { maharajQuotes, hinduStories } from "@/data/spiritualContent";
 import Navigation from "@/components/Navigation";
 import WhatsAppShareButton from "@/components/WhatsAppShareButton";
-import maharajImage from "@/assets/maharaj-ji.jpg";
+import maharajImage from "/images/Gemini_Generated_Image_hlmn5lhlmn5lhlmn.png";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import axios from "axios";
