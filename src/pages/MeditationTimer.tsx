@@ -191,7 +191,7 @@ const MeditationTimer = () => {
     <div className="min-h-screen gradient-peaceful pb-20">
       <header className="border-b border-border/50 backdrop-blur-sm bg-background/50">
         <div className="container mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold text-primary">Meditation</h1>
+          <h1 className="text-2xl font-bold text-primary">Meditation Timer — भक्ति में ध्यान, ध्यान में शांति।</h1>
         </div>
       </header>
 
@@ -295,13 +295,15 @@ const MeditationTimer = () => {
                     variant={backgroundSound === 'om' ? 'default' : 'outline'}
                     onClick={() => handleSoundTypeChange('om')}
                     size="sm"
+                    title="ॐ की ध्वनि — आत्मा का पहला स्वर।"
                   >
-                    🕉️ OM Chanting
+                    🕉️ OM Chanting (ॐ जप)
                   </Button>
                   <Button
                     variant={backgroundSound === 'nature' ? 'default' : 'outline'}
                     onClick={() => handleSoundTypeChange('nature')}
                     size="sm"
+                    title="प्रकृति की वाणी में भी भक्ति की झंकार है।"
                   >
                     🐦 Birds
                   </Button>
@@ -309,6 +311,7 @@ const MeditationTimer = () => {
                     variant={backgroundSound === 'water' ? 'default' : 'outline'}
                     onClick={() => handleSoundTypeChange('water')}
                     size="sm"
+                    title="बहता जल सिखाता है — स्थिरता भी गति में है।"
                   >
                     💧 Water
                   </Button>
@@ -316,6 +319,7 @@ const MeditationTimer = () => {
                     variant={backgroundSound === 'flute' ? 'default' : 'outline'}
                     onClick={() => handleSoundTypeChange('flute')}
                     size="sm"
+                    title="मुरली की तान — राधा नाम की पहचान।"
                   >
                     🎵 Flute
                   </Button>
@@ -323,6 +327,7 @@ const MeditationTimer = () => {
                     variant={backgroundSound === 'bell' ? 'default' : 'outline'}
                     onClick={() => handleSoundTypeChange('bell')}
                     size="sm"
+                    title="हर ध्वनि एक पुकार है — प्रभु के नाम की।"
                   >
                     🔔 Bell
                   </Button>
@@ -330,6 +335,7 @@ const MeditationTimer = () => {
                     variant={backgroundSound === 'none' ? 'default' : 'outline'}
                     onClick={() => handleSoundTypeChange('none')}
                     size="sm"
+                    title="मौन वही जहाँ ईश्वर बोलते हैं।"
                   >
                     🔇 Silent
                   </Button>
@@ -350,15 +356,15 @@ const MeditationTimer = () => {
                   />
                 </div>
 
-                {/* Sound Description */}
+                {/* Sound Quote (Hindi) */}
                 <div className="bg-primary/5 p-3 rounded-lg border border-primary/10">
-                  <p className="text-xs text-muted-foreground text-center">
-                    {backgroundSound === 'om' && 'Deep meditative OM drone - calms the mind'}
-                    {backgroundSound === 'nature' && 'Peaceful bird chirping - connects with nature'}
-                    {backgroundSound === 'water' && 'Flowing stream - washing away thoughts'}
-                    {backgroundSound === 'flute' && 'Spiritual flute melody - transcends the soul'}
-                    {backgroundSound === 'bell' && 'Temple bells - brings divine presence'}
-                    {backgroundSound === 'none' && 'Complete silence - for deep meditation'}
+                  <p key={backgroundSound} className="text-xs text-muted-foreground text-center transition-opacity duration-300 opacity-100">
+                    {backgroundSound === 'om' && '“ॐ की ध्वनि — आत्मा का पहला स्वर।”'}
+                    {backgroundSound === 'water' && '“बहता जल सिखाता है — स्थिरता भी गति में है।”'}
+                    {backgroundSound === 'bell' && '“हर ध्वनि एक पुकार है — प्रभु के नाम की।”'}
+                    {backgroundSound === 'nature' && '“प्रकृति की वाणी में भी भक्ति की झंकार है।”'}
+                    {backgroundSound === 'flute' && '“मुरली की तान — राधा नाम की पहचान।”'}
+                    {backgroundSound === 'none' && '“मौन वही जहाँ ईश्वर बोलते हैं।”'}
                   </p>
                 </div>
               </>
