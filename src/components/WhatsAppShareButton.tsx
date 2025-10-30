@@ -7,9 +7,10 @@ interface WhatsAppShareButtonProps {
   content: string;
   title?: string;
   onShareComplete?: () => void;
+  className?: string;
 }
 
-const WhatsAppShareButton = ({ content, title = "Spiritual Content", onShareComplete }: WhatsAppShareButtonProps) => {
+const WhatsAppShareButton = ({ content, title = "Spiritual Content", onShareComplete, className = "" }: WhatsAppShareButtonProps) => {
   const handleWhatsAppShare = async () => {
     try {
       // Create WhatsApp share URL
@@ -39,7 +40,7 @@ const WhatsAppShareButton = ({ content, title = "Spiritual Content", onShareComp
   return (
     <Button
       onClick={handleWhatsAppShare}
-      className="bg-green-600 hover:bg-green-700 text-white"
+      className={`bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto ${className}`}
       size="sm"
     >
       <Share2 className="h-4 w-4 mr-2" />

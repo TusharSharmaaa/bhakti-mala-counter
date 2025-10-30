@@ -202,14 +202,6 @@ const SpiritualContent = () => {
           <div>
             <h1 className="text-2xl font-bold text-primary">Spiritual Content — मन की यात्रा, माला के संग</h1>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="font-medium hover:bg-primary/10 transition-all"
-            onClick={() => setShowHindi(!showHindi)}
-          >
-            {showHindi ? "English" : "हिंदी"}
-          </Button>
         </div>
       </motion.header>
 
@@ -241,7 +233,7 @@ const SpiritualContent = () => {
                     />
                     <div>
                       <CardTitle className="text-primary">Shri Premanand Maharaj</CardTitle>
-                      <p className="text-xs text-muted-foreground">Divine Wisdom • दिव्य वचन</p>
+                      <p className="text-xs text-muted-foreground">दिव्य वचन</p>
                     </div>
                   </div>
                 </CardHeader>
@@ -252,8 +244,8 @@ const SpiritualContent = () => {
                   }} className="text-lg leading-relaxed italic px-4 py-6 bg-secondary/10 rounded-lg border-l-4 border-primary/30 cursor-grab">
                     "{showHindi ? currentQuote.quoteHindi : currentQuote.quote}"
                   </motion.blockquote>
-                  <div className="flex justify-between items-center">
-                    <div className="flex">
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-3 items-stretch sm:items-center">
+                    <div className="flex flex-wrap w-full sm:w-auto justify-center">
                       <Button
                         variant="outline"
                         size="sm"
@@ -273,7 +265,8 @@ const SpiritualContent = () => {
                     </div>
                     <WhatsAppShareButton
                       content={showHindi ? currentQuote.quoteHindi : currentQuote.quote}
-                      title="Divine Wisdom - Shri Premanand Maharaj"
+                      title="दिव्य वचन — श्री प्रेमानन्द महाराज"
+                      className="sm:ml-auto"
                     />
                   </div>
                 </CardContent>
@@ -320,8 +313,8 @@ const SpiritualContent = () => {
                     <p className="text-center text-muted-foreground">No slokas found.</p>
                   )}
 
-                  <div className="flex justify-between items-center">
-                    <div className="flex">
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-3 items-stretch sm:items-center">
+                    <div className="flex flex-wrap w-full sm:w-auto justify-center">
                       <Button
                         variant="outline"
                         size="sm"
@@ -348,6 +341,7 @@ const SpiritualContent = () => {
                           : currentSlok.tej?.et || currentSlok.siva?.et || currentSlok.gambir?.et || currentSlok.purohit?.et || currentSlok.raman?.et || ""
                         }`}
                         title={`Chapter ${currentSlok.chapter} - Bhagavad Gita`}
+                        className="sm:ml-auto"
                       />
                     )}
                   </div>
@@ -376,8 +370,8 @@ const SpiritualContent = () => {
                       {showHindi ? currentStory.moralHindi : currentStory.moral}
                     </p>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <div className="flex">
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-3 items-stretch sm:items-center">
+                    <div className="flex flex-wrap w-full sm:w-auto justify-center">
                       <Button
                         variant="outline"
                         size="sm"
@@ -398,6 +392,7 @@ const SpiritualContent = () => {
                     <WhatsAppShareButton
                       content={`${showHindi ? currentStory.titleHindi : currentStory.title}\n\n${showHindi ? currentStory.storyHindi : currentStory.story}\n\n${showHindi ? 'सीख:' : 'Moral:'} ${showHindi ? currentStory.moralHindi : currentStory.moral}`}
                       title="Hindu Spiritual Story"
+                      className="sm:ml-auto"
                     />
                   </div>
                 </CardContent>
