@@ -26,8 +26,7 @@ export class MeditationAudioEngine {
       '/audio/waterfall.mp3'
     ],
     flute: [
-      '/audio/flute-music-free-background-music-copyright-free-no-copyright-flute-sujan-lama_TDBmIE5Q.mp3',
-      '/audio/flute-music-free-background-music-copyright-free-no-copyright-flute-sujan-lama.mp3'
+      '/audio/flute-music-free-background-music-copyright-free-no-copyright-flute-sujan-lama_TDBmIE5Q.mp3'
     ],
     bell: [
       '/audio/temple bell sound effect  temple bell sound no copyright.mp3',
