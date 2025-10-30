@@ -34,6 +34,7 @@ export class DevotionalImageGenerator {
     this.drawSubheading();
     this.drawStatsCard(data);
     this.drawFooterBranding();
+    this.drawWatermark();
     
     return this.canvas.toDataURL('image/png', 0.9);
   }
@@ -241,6 +242,15 @@ export class DevotionalImageGenerator {
     this.ctx.font = '20px Arial';
     this.ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
     this.ctx.fillText('#BhaktiMalaCounter #RadhaNaamJap #SpiritualJourney', this.canvas.width / 2, this.canvas.height * 0.96);
+  }
+
+  private drawWatermark() {
+    // bottom-right subtle watermark
+    const padding = 24;
+    this.ctx.textAlign = 'right';
+    this.ctx.font = '22px Arial';
+    this.ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    this.ctx.fillText('Shared via Radha Jap Counter', this.canvas.width - padding, this.canvas.height - padding);
   }
 
   private getStreakEmoji(streak: number): string {

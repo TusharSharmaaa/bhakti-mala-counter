@@ -13,7 +13,8 @@ const WhatsAppShareButton = ({ content, title = "Spiritual Content", onShareComp
   const handleWhatsAppShare = async () => {
     try {
       // Create WhatsApp share URL
-      const shareText = `${title}\n\n${content}\n\nShared from Bhakti Mala Counter`;
+      const playLink = 'https://play.google.com/store/apps/details?id=com.tusharsharmaaa.radha';
+      const shareText = `${title}\n\n${content}\n\nDownload the app:\n${playLink}\n\nShared via Radha Jap Counter App`;
       const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
       
       // Open WhatsApp share

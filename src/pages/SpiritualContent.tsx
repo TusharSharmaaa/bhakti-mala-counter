@@ -15,10 +15,11 @@ const SpiritualContent = () => {
   const [showHindi, setShowHindi] = useState(true);
 
   // --- Quotes & Stories States ---
-  const [currentQuoteIndex, setCurrentQuoteIndex] = useState(Math.floor(Math.random() * maharajQuotes.length));
+  const [quotes, setQuotes] = useState(maharajQuotes);
+  const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
   const [currentStoryIndex, setCurrentStoryIndex] = useState(Math.floor(Math.random() * hinduStories.length));
 
-  const currentQuote = maharajQuotes[currentQuoteIndex];
+  const currentQuote = quotes[currentQuoteIndex] || quotes[0];
   const currentStory = hinduStories[currentStoryIndex];
 
   // --- Gita States ---
@@ -31,6 +32,13 @@ const SpiritualContent = () => {
 
   const getNextItem = (current: number, max: number) => (current + 1) % max;
   const getPrevItem = (current: number, max: number) => (current - 1 + max) % max;
+
+  // Shuffle quotes on first load so each user sees a different order
+  useEffect(() => {
+    const shuffled = [...maharajQuotes].sort(() => Math.random() - 0.5);
+    setQuotes(shuffled);
+    setCurrentQuoteIndex(0);
+  }, []);
 
   // --- Fetch Chapters Info ---
   useEffect(() => {
@@ -192,8 +200,7 @@ const SpiritualContent = () => {
       >
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-primary">Spiritual Content</h1>
-            <p className="text-sm text-muted-foreground">Divine wisdom for your journey</p>
+            <h1 className="text-2xl font-bold text-primary">Spiritual Content — मन की यात्रा, माला के संग</h1>
           </div>
           <Button
             variant="outline"
@@ -234,39 +241,34 @@ const SpiritualContent = () => {
                     />
                     <div>
                       <CardTitle className="text-primary">Shri Premanand Maharaj</CardTitle>
-                      <p className="text-xs text-muted-foreground">Divine Wisdom</p>
+                      <p className="text-xs text-muted-foreground">Divine Wisdom • दिव्य वचन</p>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-6 pt-6">
-                  <blockquote className="text-lg leading-relaxed italic px-4 py-6 bg-secondary/10 rounded-lg border-l-4 border-primary/30">
+                  <motion.blockquote drag="x" dragConstraints={{ left: 0, right: 0 }} onDragEnd={(e, info) => {
+                    if (info.offset.x > 60) setCurrentQuoteIndex(getPrevItem(currentQuoteIndex, maharajQuotes.length));
+                    if (info.offset.x < -60) setCurrentQuoteIndex(getNextItem(currentQuoteIndex, maharajQuotes.length));
+                  }} className="text-lg leading-relaxed italic px-4 py-6 bg-secondary/10 rounded-lg border-l-4 border-primary/30 cursor-grab">
                     "{showHindi ? currentQuote.quoteHindi : currentQuote.quote}"
-                  </blockquote>
+                  </motion.blockquote>
                   <div className="flex justify-between items-center">
-                    <div className="flex gap-1">
+                    <div className="flex">
                       <Button
                         variant="outline"
-                        size="icon"
-                        onClick={() => setCurrentQuoteIndex(getPrevItem(currentQuoteIndex, maharajQuotes.length))}
-                        className="h-8 w-8 rounded-full"
+                        size="sm"
+                        onClick={() => setCurrentQuoteIndex(getPrevItem(currentQuoteIndex, quotes.length))}
+                        className="rounded-l-lg rounded-r-none px-3"
                       >
-                        <ArrowLeft className="h-4 w-4" />
+                        <ArrowLeft className="h-4 w-4 mr-1" /> Prev
                       </Button>
                       <Button
                         variant="outline"
-                        size="icon"
-                        onClick={() => setCurrentQuoteIndex(getNextItem(currentQuoteIndex, maharajQuotes.length))}
-                        className="h-8 w-8 rounded-full"
+                        size="sm"
+                        onClick={() => setCurrentQuoteIndex(getNextItem(currentQuoteIndex, quotes.length))}
+                        className="rounded-r-lg rounded-l-none px-3 border-l-0"
                       >
-                        <ArrowRight className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setCurrentQuoteIndex(Math.floor(Math.random() * maharajQuotes.length))}
-                        className="h-8 w-8 rounded-full"
-                      >
-                        <RefreshCw className="h-4 w-4" />
+                        Next <ArrowRight className="h-4 w-4 ml-1" />
                       </Button>
                     </div>
                     <WhatsAppShareButton
@@ -319,33 +321,24 @@ const SpiritualContent = () => {
                   )}
 
                   <div className="flex justify-between items-center">
-                    <div className="flex gap-1">
+                    <div className="flex">
                       <Button
                         variant="outline"
-                        size="icon"
+                        size="sm"
                         onClick={loadPrevSloka}
-                        className="h-8 w-8 rounded-full"
+                        className="rounded-l-lg rounded-r-none px-3"
                         disabled={loading}
                       >
-                        <ArrowLeft className="h-4 w-4" />
+                        <ArrowLeft className="h-4 w-4 mr-1" /> Prev
                       </Button>
                       <Button
                         variant="outline"
-                        size="icon"
+                        size="sm"
                         onClick={loadNextSloka}
-                        className="h-8 w-8 rounded-full"
+                        className="rounded-r-lg rounded-l-none px-3 border-l-0"
                         disabled={loading}
                       >
-                        <ArrowRight className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="icon" 
-                        onClick={showRandomSloka} 
-                        className="h-8 w-8 rounded-full"
-                        disabled={loading}
-                      >
-                        <RefreshCw className="h-4 w-4" />
+                        Next <ArrowRight className="h-4 w-4 ml-1" />
                       </Button>
                     </div>
                     {currentSlok && (
@@ -374,11 +367,7 @@ const SpiritualContent = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6 pt-6">
-                  <div className="bg-background/50 p-5 rounded-lg border border-border/50">
-                    <p className="text-foreground leading-relaxed">
-                      {showHindi ? currentStory.storyHindi : currentStory.story}
-                    </p>
-                  </div>
+                  <ExpandableStory text={showHindi ? currentStory.storyHindi : currentStory.story} />
                   <div className="pt-4 px-4 pb-4 border border-primary/20 rounded-lg bg-primary/5">
                     <p className="text-sm font-medium text-primary mb-2">
                       {showHindi ? "सीख:" : "Moral:"}
@@ -388,30 +377,22 @@ const SpiritualContent = () => {
                     </p>
                   </div>
                   <div className="flex justify-between items-center">
-                    <div className="flex gap-1">
+                    <div className="flex">
                       <Button
                         variant="outline"
-                        size="icon"
+                        size="sm"
                         onClick={() => setCurrentStoryIndex(getPrevItem(currentStoryIndex, hinduStories.length))}
-                        className="h-8 w-8 rounded-full"
+                        className="rounded-l-lg rounded-r-none px-3"
                       >
-                        <ArrowLeft className="h-4 w-4" />
+                        <ArrowLeft className="h-4 w-4 mr-1" /> Prev
                       </Button>
                       <Button
                         variant="outline"
-                        size="icon"
+                        size="sm"
                         onClick={() => setCurrentStoryIndex(getNextItem(currentStoryIndex, hinduStories.length))}
-                        className="h-8 w-8 rounded-full"
+                        className="rounded-r-lg rounded-l-none px-3 border-l-0"
                       >
-                        <ArrowRight className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setCurrentStoryIndex(Math.floor(Math.random() * hinduStories.length))}
-                        className="h-8 w-8 rounded-full"
-                      >
-                        <RefreshCw className="h-4 w-4" />
+                        Next <ArrowRight className="h-4 w-4 ml-1" />
                       </Button>
                     </div>
                     <WhatsAppShareButton
@@ -432,3 +413,21 @@ const SpiritualContent = () => {
 };
 
 export default SpiritualContent;
+
+// Small expandable block for stories
+function ExpandableStory({ text }: { text: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const preview = text.split(/\s+/).slice(0, 60).join(' ');
+  return (
+    <div className="bg-background/50 p-5 rounded-lg border border-border/50">
+      <p className="text-foreground leading-relaxed">
+        {expanded ? text : `${preview}${text.length > preview.length ? '…' : ''}`}
+      </p>
+      {text.length > preview.length && (
+        <button className="mt-2 text-primary text-sm underline" onClick={() => setExpanded(!expanded)}>
+          {expanded ? ("Read less") : ("Read more")}
+        </button>
+      )}
+    </div>
+  );
+}

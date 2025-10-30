@@ -58,8 +58,21 @@ const ShareStreakButton = ({ currentStreak, longestStreak, totalMalas }: ShareSt
     console.log('Starting share process...', { generatedImage: !!generatedImage });
 
     try {
-      // Create share text
-      const shareText = `🔥 ${currentStreak} Days of Devotion! 🔥\n\n${getMotivationalQuote(currentStreak)}\n\n🏆 Best Streak: ${longestStreak} days\n📿 Total Malas: ${totalMalas}\n🔥 Current: ${currentStreak} days\n\nKeep chanting with devotion! 🙏\n\n#BhaktiMalaCounter #RadhaNaamJap #SpiritualJourney`;
+      // Caption text with rotating Hindi quote and Play Store link
+      const hindiQuotes = [
+        "हर माला तुम्हें भीतर की शांति के और पास लाती है।",
+        "जप कोई शब्द नहीं — ये एक अनुभव है।",
+        "मौन रहो, नाम कहो।",
+        "जहाँ जप है, वहाँ प्रभु हैं।",
+        "जप करो, जग भूल जाओ।",
+        "हर दिन, हर माला, एक अनुभव।",
+        "जितना जप, उतनी शांति।",
+        "नाम ही शांति का द्वार है।",
+        "माला चलाओ, मन संभालो।",
+        "भक्ति शब्दों से नहीं, भावना से होती है।",
+      ];
+      const randomQuote = hindiQuotes[Math.floor(Math.random() * hindiQuotes.length)];
+      const shareText = `\n🔥 ${currentStreak} Days of Devotion! 🔥\n\nStart your spiritual journey today! 🙏\n\n🏆 Best Streak: ${longestStreak} days\n📿 Total Malas: ${totalMalas}\n🔥 Current: ${currentStreak} days\n\n"${randomQuote}"\n\nDownload the app:\nhttps://play.google.com/store/apps/details?id=com.tusharsharmaaa.radha\n\nShared via Radha Jap Counter\n`;
       
       console.log('Fetching image blob...');
       // Convert image to blob
