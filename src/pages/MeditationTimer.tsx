@@ -84,6 +84,18 @@ const MeditationTimer = () => {
       description: "Radhe Radhe! Your meditation session is complete.",
       duration: 5000,
     });
+    // Notification API
+    try {
+      if ("Notification" in window) {
+        if (Notification.permission === 'granted') {
+          new Notification('Meditation Complete', { body: 'Radhe Radhe! Your session is complete.' });
+        } else if (Notification.permission !== 'denied') {
+          Notification.requestPermission().then((perm) => {
+            if (perm === 'granted') new Notification('Meditation Complete', { body: 'Radhe Radhe! Your session is complete.' });
+          });
+        }
+      }
+    } catch {}
     
     // Play completion sound
     playCompletionSound();
@@ -179,46 +191,38 @@ const MeditationTimer = () => {
     <div className="min-h-screen gradient-peaceful pb-20">
       <header className="border-b border-border/50 backdrop-blur-sm bg-background/50">
         <div className="container mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold text-primary">Meditation Timer</h1>
-          <p className="text-sm text-muted-foreground">Focus on your spiritual practice</p>
+          <h1 className="text-2xl font-bold text-primary">Meditation</h1>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-8 space-y-8">
         {/* Timer Display */}
         <div className="flex justify-center">
-          <div className="relative">
-            <svg className="w-80 h-80 transform -rotate-90">
+          <div className="relative w-64 h-64 sm:w-80 sm:h-80">
+            <svg viewBox="0 0 100 100" className="w-full h-full block -rotate-90">
+              <circle cx="50" cy="50" r="45" fill="none" stroke="hsl(var(--muted))" strokeWidth="6" />
               <circle
-                cx="160"
-                cy="160"
-                r="140"
+                cx="50"
+                cy="50"
+                r="45"
                 fill="none"
-                stroke="hsl(var(--muted))"
-                strokeWidth="12"
-              />
-              <circle
-                cx="160"
-                cy="160"
-                r="140"
-                fill="none"
-                stroke="url(#gradient)"
-                strokeWidth="12"
+                stroke="url(#mt-gradient)"
+                strokeWidth="6"
                 strokeLinecap="round"
-                strokeDasharray={`${2 * Math.PI * 140}`}
-                strokeDashoffset={`${2 * Math.PI * 140 * (1 - progress / 100)}`}
+                strokeDasharray={`${2 * Math.PI * 45}`}
+                strokeDashoffset={`${2 * Math.PI * 45 * (1 - progress / 100)}`}
                 className="transition-all duration-1000"
               />
               <defs>
-                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <linearGradient id="mt-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="hsl(var(--primary))" />
                   <stop offset="100%" stopColor="hsl(var(--primary-glow))" />
                 </linearGradient>
               </defs>
             </svg>
 
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-              <p className="text-6xl font-bold text-primary">{formatTime(timeLeft)}</p>
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+              <p className="text-5xl sm:text-6xl font-bold text-primary">{formatTime(timeLeft)}</p>
               <p className="text-sm text-muted-foreground mt-2">
                 {isRunning ? 'Meditating...' : 'Ready to begin'}
               </p>

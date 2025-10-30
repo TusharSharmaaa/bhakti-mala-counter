@@ -11,6 +11,32 @@ export class MeditationAudioEngine {
   private gainNodes: GainNode[] = [];
   private isPlaying: boolean = false;
   private masterGain: GainNode | null = null;
+  private audioEls: Record<string, HTMLAudioElement> = {};
+  private urlCandidates: Record<SoundType, string[]> = {
+    om: [
+      '/audio/OM Chanting Sound.wav',
+      '/audio/om.wav',
+      '/audio/om.mp3'
+    ],
+    nature: ['/audio/birds chirping sound effect loud  copyright free sound effects.mp3', '/audio/birds.mp3'],
+    water: [
+      '/audio/River sound effect  Free Ambience  free sounds.mp3',
+      '/audio/water.mp3',
+      '/audio/stream.mp3',
+      '/audio/waterfall.mp3'
+    ],
+    flute: [
+      '/audio/flute-music-free-background-music-copyright-free-no-copyright-flute-sujan-lama_TDBmIE5Q.mp3',
+      '/audio/flute-music-free-background-music-copyright-free-no-copyright-flute-sujan-lama.mp3'
+    ],
+    bell: [
+      '/audio/temple bell sound effect  temple bell sound no copyright.mp3',
+      '/audio/temple-bell.mp3',
+      '/audio/ghanti.mp3',
+      '/audio/bell.mp3'
+    ],
+    none: [],
+  };
 
   constructor() {
     try {
@@ -38,6 +64,27 @@ export class MeditationAudioEngine {
       this.audioContext = null;
       this.masterGain = null;
     }
+
+    // Defer creation until play() to avoid autoplay restrictions
+  }
+
+  private ensureAudioEl(type: SoundType): HTMLAudioElement | null {
+    if (this.audioEls[type]) return this.audioEls[type];
+    const candidates = this.urlCandidates[type];
+    if (!candidates || !candidates.length) return null;
+    const el = new Audio();
+    el.loop = true;
+    el.preload = 'auto';
+    el.crossOrigin = 'anonymous';
+    // pick first candidate that the browser claims it can play
+    const pick = candidates.find((u) => {
+      const ext = u.split('.').pop() || '';
+      const mime = ext === 'mp3' ? 'audio/mpeg' : ext === 'wav' ? 'audio/wav' : 'audio/*';
+      return el.canPlayType(mime) !== '';
+    }) || candidates[0];
+    el.src = pick;
+    this.audioEls[type] = el;
+    return el;
   }
 
   /**
@@ -49,11 +96,47 @@ export class MeditationAudioEngine {
         this.stop();
       }
 
-      if (soundType === 'none' || !this.audioContext || !this.masterGain) {
+      if (soundType === 'none') {
         return;
       }
 
+      // Ensure AudioContext is running for synthesized sounds
+      if (this.audioContext && this.audioContext.state === 'suspended') {
+        this.audioContext.resume().catch(() => {});
+      }
+
       this.isPlaying = true;
+
+      // Try file-based playback first
+      const el = this.ensureAudioEl(soundType);
+      if (el) {
+        el.currentTime = 0;
+        el.volume = this.masterGain ? this.masterGain.gain.value : 0.5;
+        let fellBack = false;
+        const fallbackToSynth = () => {
+          if (fellBack) return;
+          fellBack = true;
+          // use synthesized generator for this type
+          switch (soundType) {
+            case 'om': this.playOmChanting(); break;
+            case 'nature': this.playNatureSound(); break;
+            case 'water': this.playWaterSound(); break;
+            case 'flute': this.playFluteSound(); break;
+            case 'bell': this.playBellSound(); break;
+          }
+        };
+        const errorHandler = () => fallbackToSynth();
+        el.addEventListener('error', errorHandler, { once: true });
+        el.play().then(() => {
+          // verify playback actually progresses; otherwise fallback
+          setTimeout(() => {
+            if (!fellBack && el.currentTime === 0) {
+              fallbackToSynth();
+            }
+          }, 800);
+        }).catch(() => fallbackToSynth());
+        return;
+      }
 
       switch (soundType) {
         case 'om':
@@ -83,6 +166,10 @@ export class MeditationAudioEngine {
    */
   stop() {
     this.isPlaying = false;
+    // Stop any HTMLAudioElement playing
+    Object.values(this.audioEls).forEach((el) => {
+      try { el.pause(); el.currentTime = 0; } catch {}
+    });
     
     // Stop all oscillators
     this.oscillators.forEach(osc => {
@@ -130,7 +217,7 @@ export class MeditationAudioEngine {
       
       // Fade in
       gain.gain.setValueAtTime(0, currentTime);
-      gain.gain.linearRampToValueAtTime(0.15 / (harmonic * 0.5), currentTime + 2);
+      gain.gain.linearRampToValueAtTime(0.25 / (harmonic * 0.8), currentTime + 1.5);
       
       // Add slight vibrato
       const lfo = ctx.createOscillator();
@@ -230,7 +317,7 @@ export class MeditationAudioEngine {
 
     const gain = ctx.createGain();
     gain.gain.setValueAtTime(0, currentTime);
-    gain.gain.linearRampToValueAtTime(0.2, currentTime + 2);
+    gain.gain.linearRampToValueAtTime(0.3, currentTime + 1.5);
 
     noise.connect(filter);
     filter.connect(gain);
@@ -270,8 +357,8 @@ export class MeditationAudioEngine {
         
         // Flute-like envelope
         gain.gain.setValueAtTime(0, currentTime);
-        gain.gain.linearRampToValueAtTime(0.15, currentTime + 0.1);
-        gain.gain.linearRampToValueAtTime(0.12, currentTime + 0.8);
+        gain.gain.linearRampToValueAtTime(0.2, currentTime + 0.1);
+        gain.gain.linearRampToValueAtTime(0.16, currentTime + 0.8);
         gain.gain.exponentialRampToValueAtTime(0.001, currentTime + 1.2);
         
         osc.connect(gain);
@@ -343,6 +430,7 @@ export class MeditationAudioEngine {
     if (this.masterGain) {
       this.masterGain.gain.value = Math.max(0, Math.min(1, volume));
     }
+    Object.values(this.audioEls).forEach((el) => { el.volume = Math.max(0, Math.min(1, volume)); });
   }
 
   /**
