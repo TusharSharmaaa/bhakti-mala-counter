@@ -86,25 +86,25 @@ const Home = () => {
       <main className="container mx-auto px-4 py-4 sm:py-6 md:py-8 space-y-4 sm:space-y-6 md:space-y-8">
         {/* Quick Stats with Enhanced Interactivity */}
         <div className="grid grid-cols-3 gap-2 sm:gap-3 text-center">
-          <div className="bg-card/50 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:scale-105 cursor-pointer group">
+          <div className="bg-card/50 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:scale-105 cursor-pointer group min-h-[96px]">
             <div className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
               <img src="/images/Gemini_Generated_Image_ofn47sofn47sofn4 (1).png" alt="Mala" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
             </div>
             <p className="text-xs text-muted-foreground mb-1">Today's Jap</p>
             <p className="text-xl sm:text-2xl md:text-3xl font-bold text-primary">{counter.today_count}</p>
           </div>
-          <div className="bg-card/50 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 border border-border/50 hover:border-accent/50 transition-all hover:shadow-lg hover:scale-105 cursor-pointer group">
+          <div className="bg-card/50 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 border border-border/50 hover:border-accent/50 transition-all hover:shadow-lg hover:scale-105 cursor-pointer group min-h-[96px]">
             <div className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2 rounded-full bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
               <img src="/images/Gemini_Generated_Image_sxyq38sxyq38sxyq.png" alt="Mala" className="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
             </div>
             <p className="text-xs text-muted-foreground mb-1">Malas</p>
             <p className="text-xl sm:text-2xl md:text-3xl font-bold text-accent">{malas}</p>
           </div>
-          <div className="bg-card/50 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 border border-border/50 hover:border-secondary/50 transition-all hover:shadow-lg hover:scale-105 cursor-pointer group">
+          <div className="bg-card/50 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 border border-border/50 hover:border-secondary/50 transition-all hover:shadow-lg hover:scale-105 cursor-pointer group min-h-[96px]">
             <div className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2 rounded-full bg-secondary/10 flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
                <img src="/images/Gemini_Generated_Image_8e5j1n8e5j1n8e5j.png" alt="Mala" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
             </div>
-            <p className="text-xs text-muted-foreground mb-1">Lifetime Mala's</p>
+            <p className="text-xs text-muted-foreground mb-1 whitespace-nowrap">Lifetime Mala's</p>
             <p className="text-xl sm:text-2xl md:text-3xl font-bold text-secondary">{Math.floor(counter.count / 108)}</p>
           </div>
         </div>

@@ -250,7 +250,7 @@ const CounterButton = ({ count, onCount, onMalaComplete }: CounterButtonProps) =
           <div className="flex items-center gap-1 sm:gap-2 pointer-events-none">
             <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-white/60 animate-pulse" />
             <span className="text-white/80 tracking-wider font-medium" style={{ fontSize: 'clamp(11px, 3vw, 14px)' }}>
-              {Math.floor(count / 108)} Mala{Math.floor(count / 108) !== 1 ? 's' : ''}
+              {Math.floor(count / 108)} Mala's
             </span>
             <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-white/60 animate-pulse" />
           </div>
