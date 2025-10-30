@@ -70,29 +70,31 @@ const ShareStreakButton = ({ currentStreak, longestStreak, totalMalas }: ShareSt
       console.log('Blob created:', { size: blob.size, type: blob.type });
 
       // Check if native sharing is supported
-      const canShareFiles = navigator.share && navigator.canShare && navigator.canShare({ files: [file] });
+      const hasShare = typeof navigator !== 'undefined' && !!navigator.share;
+      const canShareFilesApi = typeof navigator !== 'undefined' && (navigator as any).canShare && (navigator as any).canShare({ files: [file] });
+      const canShareFiles = !!hasShare && (!!canShareFilesApi);
       console.log('Native share support:', { 
         hasShare: !!navigator.share, 
         hasCanShare: !!navigator.canShare, 
         canShareFiles 
       });
 
-      // Try native Web Share API with files first
-      if (canShareFiles) {
+      // Try native Web Share API with files first (some browsers don't expose canShare but still work)
+      if (hasShare) {
         try {
           console.log('Attempting native share...');
-          await navigator.share({
+          await (navigator as any).share({
             files: [file],
             text: shareText,
             title: `${currentStreak} Days of Devotion`,
           });
           console.log('Native share successful');
-          toast.success("Image shared successfully! 📱");
+          toast.success("Shared with image! 📱", { description: 'If WhatsApp is available, choose Status or chat.' });
           setShowImageModal(false);
           return;
-        } catch (shareError) {
-          console.log('Native share failed:', shareError);
-          // Fall through to download method
+        } catch (shareError: any) {
+          console.log('Native share attempt errored:', shareError);
+          // If the error indicates files unsupported, fall back to download
         }
       }
 
@@ -113,7 +115,7 @@ const ShareStreakButton = ({ currentStreak, longestStreak, totalMalas }: ShareSt
         duration: 4000,
       });
       
-      // Also try to open WhatsApp with text
+      // Also try to open WhatsApp with text (image cannot be sent via URL scheme from web)
       const whatsappUrl = (isMobile ? 'whatsapp://send?text=' : 'https://wa.me/?text=') + encodeURIComponent(shareText);
       console.log('Opening WhatsApp:', whatsappUrl);
       
