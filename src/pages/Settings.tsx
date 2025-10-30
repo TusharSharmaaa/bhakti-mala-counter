@@ -6,8 +6,10 @@ import { Settings as SettingsIcon, Bell, Moon, Sun, Volume2, Info, Star } from "
 import Navigation from "@/components/Navigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 const Settings = () => {
+  const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(false);
   const [soundFeedback, setSoundFeedback] = useState(true);
@@ -31,7 +33,7 @@ const Settings = () => {
     localStorage.setItem('app_sound_feedback', JSON.stringify(soundFeedback));
     // language preference removed
     try { document.querySelector('meta[name="theme-color"]')?.setAttribute('content', darkMode ? '#0d0d0d' : '#ffffff'); } catch {}
-    toast.success("Settings saved!", { closeButton: true });
+    toast.success("Settings saved!", { position: "bottom-center", closeButton: true });
   };
 
   const handleDarkModeToggle = (checked: boolean) => {
@@ -145,8 +147,8 @@ const Settings = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-2">
-              <Button variant="outline" onClick={() => window.open('/privacy-policy','_blank')}>Privacy Policy</Button>
-              <Button variant="outline" onClick={() => window.open('/terms','_blank')}>Terms & Conditions</Button>
+              <Button variant="outline" onClick={() => navigate('/privacy-policy')}>Privacy Policy</Button>
+              <Button variant="outline" onClick={() => navigate('/terms')}>Terms & Conditions</Button>
               <div className="p-4 rounded-lg border border-border/60 bg-background/50 text-center">
                 <div className="mb-2 font-medium">Rate on Play Store — Radha Jap Counter</div>
                 <p className="text-sm text-muted-foreground mb-3">“आपका एक आशीर्वाद — हमारी साधना को आगे बढ़ाता है।”</p>

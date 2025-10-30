@@ -9,6 +9,8 @@ import SpiritualContent from "./pages/SpiritualContent";
 import MeditationTimer from "./pages/MeditationTimer";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Terms from "./pages/Terms";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +26,8 @@ const App = () => (
           <Route path="/spiritual" element={<SpiritualContent />} />
           <Route path="/timer" element={<MeditationTimer />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<Terms />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

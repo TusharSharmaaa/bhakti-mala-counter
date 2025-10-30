@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { MeditationAudioEngine, SoundType } from "@/lib/meditationAudio";
 
 const MeditationTimer = () => {
+  // Ensure page opens at top
+  useEffect(() => { try { window.scrollTo({ top: 0, behavior: 'auto' }); } catch {} }, []);
   const [duration, setDuration] = useState(5); // minutes
   const [timeLeft, setTimeLeft] = useState(duration * 60); // seconds
   const [isRunning, setIsRunning] = useState(false);
@@ -372,6 +374,25 @@ const MeditationTimer = () => {
           </CardContent>
         </Card>
       </main>
+
+      {/* Flush, full-width banner just above bottom navigation */}
+      <div
+        className="fixed left-0 right-0 z-40"
+        style={{ bottom: '64px' }}
+        aria-label="Ad banner"
+      >
+        <div
+          className="mx-auto"
+          style={{
+            width: '100%',
+            maxWidth: '100%',
+            height: 50,
+            marginTop: 8,
+            marginBottom: 0,
+            background: 'linear-gradient(135deg, #FDEBF7, #F9D8E9)'
+          }}
+        />
+      </div>
 
       <Navigation />
     </div>

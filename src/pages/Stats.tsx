@@ -18,6 +18,11 @@ const Stats = () => {
     loadStreakDataFromDB();
   }, []);
 
+  // Ensure page opens at top (consistent behavior)
+  useEffect(() => {
+    try { window.scrollTo({ top: 0, behavior: 'auto' }); } catch {}
+  }, []);
+
   const loadStreakDataFromDB = async () => {
     try {
       const data = await loadStreakData();

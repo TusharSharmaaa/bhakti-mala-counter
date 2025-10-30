@@ -6,19 +6,16 @@ interface CounterButtonProps {
   count: number;
   onCount: () => void;
   onMalaComplete: () => void;
-  onUndo?: () => void;
 }
 
-const CounterButton = ({ count, onCount, onMalaComplete, onUndo }: CounterButtonProps) => {
+const CounterButton = ({ count, onCount, onMalaComplete }: CounterButtonProps) => {
   const [soundEnabled, setSoundEnabled] = useState(() => {
     const saved = localStorage.getItem('radha-sound-enabled');
     return saved ? JSON.parse(saved) : true;
   });
-  const [showUndo, setShowUndo] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const resetTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const undoTimerRef = useRef<NodeJS.Timeout | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const audioBufferRef = useRef<AudioBuffer | null>(null);
 
@@ -128,25 +125,9 @@ const CounterButton = ({ count, onCount, onMalaComplete, onUndo }: CounterButton
     
     onCount();
     
-    // Show undo button for 3 seconds
-    setShowUndo(true);
-    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
-    undoTimerRef.current = setTimeout(() => setShowUndo(false), 3000);
-    
     // Check if mala is complete
     if (nextMalaCount === 0) {
       onMalaComplete();
-    }
-  };
-
-  const handleUndo = () => {
-    if (onUndo) {
-      onUndo();
-      setShowUndo(false);
-      if (undoTimerRef.current) {
-        clearTimeout(undoTimerRef.current);
-        undoTimerRef.current = null;
-      }
     }
   };
 
@@ -156,15 +137,12 @@ const CounterButton = ({ count, onCount, onMalaComplete, onUndo }: CounterButton
       if (e.code === 'Space' || e.code === 'Enter') {
         e.preventDefault();
         handleClick();
-      } else if (e.code === 'ArrowLeft' && showUndo) {
-        e.preventDefault();
-        handleUndo();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showUndo, count]);
+  }, [count]);
 
   // Listen for global tap sound requests
   useEffect(() => {
@@ -179,7 +157,6 @@ const CounterButton = ({ count, onCount, onMalaComplete, onUndo }: CounterButton
   useEffect(() => {
     return () => {
       if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
-      if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
     };
   }, []);
 
@@ -288,19 +265,7 @@ const CounterButton = ({ count, onCount, onMalaComplete, onUndo }: CounterButton
         </button>
       </div>
 
-      {/* Undo Button (shows for 3s after increment) */}
-      {showUndo && onUndo && (
-        <button
-          onClick={handleUndo}
-          className="px-4 sm:px-6 py-2 rounded-full bg-secondary text-secondary-foreground
-            shadow-soft hover:bg-secondary/80 transition-smooth min-h-[40px] sm:min-h-[48px]
-            text-sm sm:text-base
-            animate-in fade-in slide-in-from-bottom-2 duration-200"
-          aria-label="Undo last increment"
-        >
-          ← Undo
-        </button>
-      )}
+      {/* Undo removed intentionally for a distraction-free flow */}
 
       {/* Progress Info */}
       <div className="text-center font-bold space-y-1 px-4">

@@ -29,9 +29,7 @@ const Home = () => {
     }
   };
 
-  const handleUndo = () => {
-    decrement();
-  };
+  // Undo removed for a cleaner flow
 
   if (counterLoading) {
     return (
@@ -106,8 +104,8 @@ const Home = () => {
             <div className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2 rounded-full bg-secondary/10 flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
                <img src="/images/Gemini_Generated_Image_8e5j1n8e5j1n8e5j.png" alt="Mala" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
             </div>
-            <p className="text-xs text-muted-foreground mb-1">Lifetime Jap</p>
-            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-secondary">{counter.count}</p>
+            <p className="text-xs text-muted-foreground mb-1">Lifetime Mala's</p>
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-secondary">{Math.floor(counter.count / 108)}</p>
           </div>
         </div>
 
@@ -117,7 +115,6 @@ const Home = () => {
             count={counter.count} 
             onCount={handleCount}
             onMalaComplete={handleMalaComplete}
-            onUndo={handleUndo}
           />
         </div>
 
@@ -133,6 +130,25 @@ const Home = () => {
           </div>
         </div>
       </main>
+
+      {/* Flush, full-width banner just above bottom navigation */}
+      <div
+        className="fixed left-0 right-0 z-40"
+        style={{ bottom: '64px' }}
+        aria-label="Ad banner"
+      >
+        <div
+          className="mx-auto"
+          style={{
+            width: '100%',
+            maxWidth: '100%',
+            height: 50,
+            marginTop: 8,
+            marginBottom: 0,
+            background: 'linear-gradient(135deg, #FDEBF7, #F9D8E9)'
+          }}
+        />
+      </div>
 
       <div className="pb-16" data-no-global-tap>
         <Navigation />

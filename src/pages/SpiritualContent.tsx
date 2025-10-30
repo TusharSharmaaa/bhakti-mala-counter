@@ -13,6 +13,8 @@ import axios from "axios";
 
 const SpiritualContent = () => {
   const [showHindi, setShowHindi] = useState(true);
+  // Ensure page opens at top
+  useEffect(() => { try { window.scrollTo({ top: 0, behavior: 'auto' }); } catch {} }, []);
 
   // --- Quotes & Stories States ---
   const [quotes, setQuotes] = useState(maharajQuotes);
@@ -272,6 +274,12 @@ const SpiritualContent = () => {
                 </CardContent>
               </Card>
             </motion.div>
+            {/* Native-like blended ad after content block */}
+            <div className="w-full" aria-label="Ad native">
+              <div
+                style={{ width: '100%', height: 120, marginTop: 8, marginBottom: 0, background: 'linear-gradient(135deg, #FDEBF7, #F9D8E9)' }}
+              />
+            </div>
           </TabsContent>
 
           {/* --- Gita Tab (Dynamic from API) --- */}
@@ -348,6 +356,11 @@ const SpiritualContent = () => {
                 </CardContent>
               </Card>
             </motion.div>
+            <div className="w-full" aria-label="Ad native">
+              <div
+                style={{ width: '100%', height: 120, marginTop: 8, marginBottom: 0, background: 'linear-gradient(135deg, #FDEBF7, #F9D8E9)' }}
+              />
+            </div>
           </TabsContent>
 
           {/* --- Stories Tab --- */}
@@ -398,6 +411,11 @@ const SpiritualContent = () => {
                 </CardContent>
               </Card>
             </motion.div>
+            <div className="w-full" aria-label="Ad native">
+              <div
+                style={{ width: '100%', height: 120, marginTop: 8, marginBottom: 0, background: 'linear-gradient(135deg, #FDEBF7, #F9D8E9)' }}
+              />
+            </div>
           </TabsContent>
         </Tabs>
       </main>
