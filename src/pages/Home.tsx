@@ -122,13 +122,15 @@ const Home = () => {
         </div>
 
         {/* Footer Quote */}
-        <div className="text-center space-y-1 sm:space-y-2 mb-16 sm:mb-20 pt-2 px-4">
-          <p className="text-xs sm:text-sm font-bold text-muted-foreground italic">
-            "राधे राधे - The sweetest name in all the universes"
-          </p>
-          <p className="text-xs font-bold text-muted-foreground">
-            Inspired by the teachings of Shri Premanand Maharaj Ji
-          </p>
+        <div className="text-center mb-16 sm:mb-20 pt-2 px-4">
+          <div className="inline-block px-5 py-3 rounded-xl border backdrop-blur" style={{
+            backgroundColor: 'rgba(255,255,255,0.75)',
+            borderColor: 'rgba(0,0,0,0.08)'
+          }}>
+            <p className="italic text-base sm:text-lg font-semibold" style={{ color: '#37306B' }}>
+              "हर माला एक मौन प्रार्थना है।"
+            </p>
+          </div>
         </div>
       </main>
 

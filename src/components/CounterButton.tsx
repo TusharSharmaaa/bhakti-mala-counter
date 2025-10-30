@@ -186,7 +186,10 @@ const CounterButton = ({ count, onCount, onMalaComplete, onUndo }: CounterButton
   return (
     <div className="relative flex flex-col items-center gap-6">
       {/* Single Filled Circle with White Progress Border */}
-      <div className="relative">
+      <div
+        className="relative"
+        style={{ width: 'clamp(220px, 60vw, 420px)', height: 'clamp(220px, 60vw, 420px)' }}
+      >
         {/* Mute toggle - positioned just outside the circle */}
         <button
           onClick={(e) => { e.stopPropagation(); setSoundEnabled((v) => !v); }}
@@ -197,28 +200,29 @@ const CounterButton = ({ count, onCount, onMalaComplete, onUndo }: CounterButton
           {soundEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
         </button>
         {/* White Progress Ring - Outer Border */}
-        <svg className="absolute inset-0 w-full h-full transform -rotate-90" style={{ filter: 'drop-shadow(0 0 20px rgba(255,255,255,0.3))' }}>
+        <svg className="absolute inset-0 w-full h-full transform -rotate-90 pointer-events-none">
           <circle
             cx="50%"
             cy="50%"
             r="47.5%"
             fill="none"
-            stroke="rgba(255, 255, 255, 0.2)"
+            stroke="rgba(255, 255, 255, 0.08)"
             strokeWidth="1.875%"
           />
-          <circle
-            cx="50%"
-            cy="50%"
-            r="47.5%"
-            fill="none"
-            stroke="white"
-            strokeWidth="1.875%"
-            strokeLinecap="round"
-            strokeDasharray={`${2 * Math.PI * 47.5}`}
-            strokeDashoffset={`${2 * Math.PI * 47.5 * (1 - progress)}`}
-            className="transition-all duration-300"
-            style={{ filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.8))' }}
-          />
+          {progress > 0 && (
+            <circle
+              cx="50%"
+              cy="50%"
+              r="47.5%"
+              fill="none"
+              stroke="white"
+              strokeWidth="1.875%"
+              strokeLinecap="round"
+              strokeDasharray={`${2 * Math.PI * 47.5}`}
+              strokeDashoffset={`${2 * Math.PI * 47.5 * (1 - progress)}`}
+              className="transition-all duration-300"
+            />
+          )}
         </svg>
 
         {/* Main Filled Counter Button - Single Interactive Circle */}
@@ -229,14 +233,17 @@ const CounterButton = ({ count, onCount, onMalaComplete, onUndo }: CounterButton
           onPointerLeave={(e) => handlePointerUp(e)}
           onClick={(e) => { e.stopPropagation(); handleClick(); }}
           aria-label={`Count ${currentMalaCount} of 108. Press to increment.`}
-          className={`counter-btn relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-96 lg:h-96 
-            min-h-[200px] sm:min-h-[240px] md:min-h-[280px] lg:min-h-[320px]
+          className={`counter-btn relative 
             rounded-full gradient-divine shadow-divine
             flex flex-col items-center justify-center gap-1 sm:gap-2
             transition-all duration-150 overflow-hidden select-none
             ${isPressed ? 'scale-95 shadow-2xl' : 'scale-100 hover:scale-[1.02] active:scale-95'}
             ${isResetting ? 'opacity-50' : ''}`}
           style={{
+            width: 'clamp(220px, 60vw, 420px)',
+            height: 'clamp(220px, 60vw, 420px)',
+            minHeight: '0',
+            aspectRatio: '1 / 1',
             boxShadow: isPressed 
               ? '0 10px 40px -10px rgba(var(--primary), 0.6), inset 0 2px 8px rgba(0,0,0,0.3)' 
               : '0 20px 60px -15px rgba(var(--primary), 0.5), 0 0 40px rgba(var(--primary-glow), 0.3)'
@@ -251,15 +258,21 @@ const CounterButton = ({ count, onCount, onMalaComplete, onUndo }: CounterButton
           )}
           
           {/* Counter Content */}
-          <span className="text-white/90 text-xs sm:text-sm font-semibold tracking-widest uppercase pointer-events-none animate-pulse">
+          <span
+            className="text-white/90 font-semibold tracking-widest uppercase pointer-events-none animate-pulse"
+            style={{ fontSize: 'clamp(12px, 4vw, 20px)', textShadow: '0 1px 2px rgba(0,0,0,0.25)' }}
+          >
             ॐ राधा राधा ॐ
           </span>
-          <span className="text-white text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight pointer-events-none drop-shadow-lg">
+          <span
+            className="text-white font-bold tracking-tight pointer-events-none drop-shadow-lg"
+            style={{ fontSize: 'clamp(52px, 15vw, 110px)' }}
+          >
             {currentMalaCount}
           </span>
           <div className="flex items-center gap-1 sm:gap-2 pointer-events-none">
             <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-white/60 animate-pulse" />
-            <span className="text-white/80 text-xs sm:text-sm tracking-wider font-medium">
+            <span className="text-white/80 tracking-wider font-medium" style={{ fontSize: 'clamp(11px, 3vw, 14px)' }}>
               {Math.floor(count / 108)} Mala{Math.floor(count / 108) !== 1 ? 's' : ''}
             </span>
             <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-white/60 animate-pulse" />
@@ -291,10 +304,10 @@ const CounterButton = ({ count, onCount, onMalaComplete, onUndo }: CounterButton
 
       {/* Progress Info */}
       <div className="text-center font-bold space-y-1 px-4">
-        <p className="text-xs sm:text-sm font-bold text-muted-foreground">
+        <p className="text-base sm:text-lg font-extrabold text-muted-foreground">
           {remaining} more to complete this mala
         </p>
-        <p className="text-xs font-bold text-muted-foreground/70">
+        <p className="text-base font-extrabold text-muted-foreground/70">
           Progress: {percentage}%
         </p>
       </div>
