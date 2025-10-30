@@ -1,56 +1,47 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Settings as SettingsIcon, Bell, Target, Moon, Sun, Volume2 } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Moon, Sun, Volume2, Info, Star } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 const Settings = () => {
-  const [loading, setLoading] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(false);
-  const [dailyTarget, setDailyTarget] = useState(108);
-  const [soundEnabled, setSoundEnabled] = useState(true);
-  const [soundOption, setSoundOption] = useState('radha');
+  const [soundFeedback, setSoundFeedback] = useState(true);
+  // language setting removed per latest spec; keeping placeholder state if needed later
 
   useEffect(() => {
-    // Load from localStorage
-    const savedDarkMode = localStorage.getItem('radha-dark-mode');
-    const savedNotifications = localStorage.getItem('radha-notifications');
-    const savedDailyTarget = localStorage.getItem('radha-daily-target');
-    const savedSoundEnabled = localStorage.getItem('radha-sound-enabled');
-    const savedSoundOption = localStorage.getItem('radha-sound-option');
-    
-    if (savedDarkMode) setDarkMode(JSON.parse(savedDarkMode));
-    if (savedNotifications) setNotifications(JSON.parse(savedNotifications));
-    if (savedDailyTarget) setDailyTarget(JSON.parse(savedDailyTarget));
-    if (savedSoundEnabled) setSoundEnabled(JSON.parse(savedSoundEnabled));
-    if (savedSoundOption) setSoundOption(JSON.parse(savedSoundOption));
-    
-    if (JSON.parse(savedDarkMode || 'false')) {
+    const savedTheme = localStorage.getItem('app_theme');
+    const savedNoti = localStorage.getItem('app_notifications');
+    const savedSound = localStorage.getItem('app_sound_feedback');
+    if (savedTheme) setDarkMode(savedTheme === 'dark');
+    if (savedNoti) setNotifications(JSON.parse(savedNoti));
+    if (savedSound) setSoundFeedback(JSON.parse(savedSound));
+    if ((savedTheme || '') === 'dark') {
       document.documentElement.classList.add('dark');
     }
   }, []);
 
   const saveSettings = async () => {
-    localStorage.setItem('radha-dark-mode', JSON.stringify(darkMode));
-    localStorage.setItem('radha-notifications', JSON.stringify(notifications));
-    localStorage.setItem('radha-daily-target', JSON.stringify(dailyTarget));
-    localStorage.setItem('radha-sound-enabled', JSON.stringify(soundEnabled));
-    localStorage.setItem('radha-sound-option', JSON.stringify(soundOption));
-    toast.success("Settings saved!");
+    localStorage.setItem('app_theme', darkMode ? 'dark' : 'light');
+    localStorage.setItem('app_notifications', JSON.stringify(notifications));
+    localStorage.setItem('app_sound_feedback', JSON.stringify(soundFeedback));
+    // language preference removed
+    try { document.querySelector('meta[name="theme-color"]')?.setAttribute('content', darkMode ? '#0d0d0d' : '#ffffff'); } catch {}
+    toast.success("Settings saved!", { closeButton: true });
   };
 
   const handleDarkModeToggle = (checked: boolean) => {
     setDarkMode(checked);
     if (checked) {
       document.documentElement.classList.add('dark');
+      try { document.querySelector('meta[name=\"theme-color\"]')?.setAttribute('content', '#0d0d0d'); } catch {}
     } else {
       document.documentElement.classList.remove('dark');
+      try { document.querySelector('meta[name=\"theme-color\"]')?.setAttribute('content', '#ffffff'); } catch {}
     }
   };
 
@@ -84,61 +75,8 @@ const Settings = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 space-y-6">
-        {/* Appearance */}
-        <Card className="shadow-soft border-border/50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                {darkMode ? <Moon className="h-4 w-4 text-primary" /> : <Sun className="h-4 w-4 text-primary" />}
-              </div>
-              Appearance
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="dark-mode">Dark Mode</Label>
-              <div 
-                className={cn(
-                  "w-12 h-6 flex items-center rounded-full p-1 cursor-pointer",
-                  darkMode ? "bg-primary justify-end" : "bg-muted justify-start"
-                )}
-                onClick={() => handleDarkModeToggle(!darkMode)}
-              >
-                <div className="bg-white w-4 h-4 rounded-full shadow-md"></div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Daily Target */}
-        <Card className="shadow-soft border-border/50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                <Target className="h-4 w-4 text-primary" />
-              </div>
-              Daily Target
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="target">Set your daily Jap target</Label>
-              <Input
-                id="target"
-                type="number"
-                min="108"
-                step="108"
-                value={dailyTarget}
-                onChange={(e) => setDailyTarget(parseInt(e.target.value) || 108)}
-                className="w-full"
-              />
-              <p className="text-xs text-muted-foreground">
-                Recommended multiples of 108 (1 mala = 108 Jap)
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+      <main className="container mx-auto px-4 sm:px-6 py-8 space-y-6">
+        {/* Theme temporarily hidden per spec update */}
 
         {/* Notifications */}
         <Card className="shadow-soft border-border/50">
@@ -169,100 +107,60 @@ const Settings = () => {
           </CardContent>
         </Card>
 
-        {/* Sound Options */}
+        {/* Sound (feedback only) */}
         <Card className="shadow-soft border-border/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                 <Volume2 className="h-4 w-4 text-primary" />
               </div>
-              Sound Options
+              Sound
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="sound-enabled">Enable Sound</Label>
-                <div 
-                  className={cn(
-                    "w-12 h-6 flex items-center rounded-full p-1 cursor-pointer",
-                    soundEnabled ? "bg-primary justify-end" : "bg-muted justify-start"
-                  )}
-                  onClick={() => setSoundEnabled(!soundEnabled)}
-                >
-                  <div className="bg-white w-4 h-4 rounded-full shadow-md"></div>
-                </div>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="sound-feedback">Play sound feedback on actions</Label>
+              <div 
+                className={cn(
+                  "w-12 h-6 flex items-center rounded-full p-1 cursor-pointer",
+                  soundFeedback ? "bg-primary justify-end" : "bg-muted justify-start"
+                )}
+                onClick={() => setSoundFeedback(!soundFeedback)}
+              >
+                <div className="bg-white w-4 h-4 rounded-full shadow-md"></div>
               </div>
-              {soundEnabled && (
-                <div className="space-y-3 pl-2">
-                  <p className="text-xs text-muted-foreground mb-3">Select tap sound:</p>
-                  {/* Radha Voice Option */}
-                  <button
-                    onClick={() => setSoundOption('radha')}
-                    className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-accent/10 transition-colors group"
-                  >
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-                      soundOption === 'radha' 
-                        ? 'bg-primary text-primary-foreground shadow-lg scale-110' 
-                        : 'bg-muted text-muted-foreground border-2 border-border'
-                    }`}>
-                      {soundOption === 'radha' && (
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
-                    </div>
-                    <div className="flex-1 text-left">
-                      <Label className="cursor-pointer text-base font-medium">Radha (Voice)</Label>
-                      <p className="text-xs text-muted-foreground">Gentle devotional voice</p>
-                    </div>
-                  </button>
+            </div>
+          </CardContent>
+        </Card>
 
-                  {/* OM Chanting Option */}
-                  <button
-                    onClick={() => setSoundOption('om')}
-                    className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-accent/10 transition-colors group"
-                  >
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-                      soundOption === 'om' 
-                        ? 'bg-primary text-primary-foreground shadow-lg scale-110' 
-                        : 'bg-muted text-muted-foreground border-2 border-border'
-                    }`}>
-                      {soundOption === 'om' && (
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
-                    </div>
-                    <div className="flex-1 text-left">
-                      <Label className="cursor-pointer text-base font-medium">OM Chanting</Label>
-                      <p className="text-xs text-muted-foreground">Sacred mantra sound</p>
-                    </div>
-                  </button>
-
-                  {/* Temple Bell Option */}
-                  <button
-                    onClick={() => setSoundOption('bell')}
-                    className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-accent/10 transition-colors group"
-                  >
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-                      soundOption === 'bell' 
-                        ? 'bg-primary text-primary-foreground shadow-lg scale-110' 
-                        : 'bg-muted text-muted-foreground border-2 border-border'
-                    }`}>
-                      {soundOption === 'bell' && (
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
-                    </div>
-                    <div className="flex-1 text-left">
-                      <Label className="cursor-pointer text-base font-medium">Temple Bell</Label>
-                      <p className="text-xs text-muted-foreground">Traditional bell chime</p>
-                    </div>
-                  </button>
-                </div>
-              )}
+        {/* About */}
+        <Card className="shadow-soft border-border/50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <Info className="h-4 w-4 text-primary" />
+              </div>
+              About
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-2">
+              <Button variant="outline" onClick={() => window.open('/privacy-policy','_blank')}>Privacy Policy</Button>
+              <Button variant="outline" onClick={() => window.open('/terms','_blank')}>Terms & Conditions</Button>
+              <div className="p-4 rounded-lg border border-border/60 bg-background/50 text-center">
+                <div className="mb-2 font-medium">Rate on Play Store — Radha Jap Counter</div>
+                <p className="text-sm text-muted-foreground mb-3">“आपका एक आशीर्वाद — हमारी साधना को आगे बढ़ाता है।”</p>
+                <Button variant="outline" onClick={() => window.open('https://play.google.com/store/apps/details?id=com.tusharsharmaaa.radha','_blank')}>Rate on Play Store</Button>
+              </div>
+              <Button onClick={() => {
+                if ((navigator as any).share) {
+                  (navigator as any).share({ text: 'हर जप तुम्हें भीतर की शांति के और पास लाता है।', url: 'https://play.google.com/store/apps/details?id=com.tusharsharmaaa.radha', title: 'Radha Jap Counter' }).catch(() => {});
+                } else {
+                  window.open('https://wa.me/?text='+encodeURIComponent('हर जप तुम्हें भीतर की शांति के और पास लाता है।\nhttps://play.google.com/store/apps/details?id=com.tusharsharmaaa.radha'),'_blank');
+                }
+              }}>Share App</Button>
+              <p className="text-xs text-muted-foreground text-center mt-2">Radha Jap Counter v1.0.0</p>
+              <p className="text-xs text-muted-foreground text-center">“हर जप तुम्हें भीतर की शांति के और पास लाता है।”</p>
             </div>
           </CardContent>
         </Card>

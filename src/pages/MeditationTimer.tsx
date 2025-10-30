@@ -297,7 +297,7 @@ const MeditationTimer = () => {
                     size="sm"
                     title="ॐ की ध्वनि — आत्मा का पहला स्वर।"
                   >
-                    🕉️ OM Chanting (ॐ जप)
+                    🕉️ ॐ जप
                   </Button>
                   <Button
                     variant={backgroundSound === 'nature' ? 'default' : 'outline'}
