@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import * as React from 'react';
+import { ADS_ENABLED } from '@/config/ads';
 
 // Safe hooks that use dynamic imports to avoid crashes in web preview
 // AdMob only works in native Android/iOS builds
@@ -15,7 +16,7 @@ export function useBannerAd(enabled: boolean, position: 'top' | 'bottom' = 'bott
     let cleanup: (() => void) | undefined;
     
     (async () => {
-      if (!enabled) return;
+      if (!enabled || !ADS_ENABLED) return;
       
       try {
         const { getAdMobService } = await import('@/services/admob');
