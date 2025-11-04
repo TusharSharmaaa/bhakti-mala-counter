@@ -2,7 +2,6 @@ import { Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { updateStreakOnShare } from "@/lib/streakSupabase";
 import { toast } from "sonner";
-import { getAdMobService, PLACEMENTS } from "@/services/admob";
 
 interface WhatsAppShareButtonProps {
   content: string;
@@ -14,10 +13,21 @@ interface WhatsAppShareButtonProps {
 const WhatsAppShareButton = ({ content, title = "Spiritual Content", onShareComplete, className = "" }: WhatsAppShareButtonProps) => {
   const handleWhatsAppShare = async () => {
     try {
-      // Show interstitial ad before sharing (Stats page placement)
-      const adMobService = getAdMobService();
-      if (adMobService.isAvailable()) {
-        await adMobService.showInterstitial(PLACEMENTS.INT_CONTENT_EXIT);
+      // Try showing interstitial ad before sharing (safe dynamic import)
+      try {
+        const mod: any = await import("@/services/admob");
+        const getService = mod.getAdMobService || mod.default?.getAdMobService;
+        const placements = mod.PLACEMENTS;
+        if (getService && placements) {
+          const service = getService();
+          if (service?.isAvailable?.()) {
+            await service.showInterstitial(
+              placements.REW_SHARE_STATS_CARD || placements.INT_CONTENT_EXIT || "share_whatsapp"
+            );
+          }
+        }
+      } catch (_) {
+        // Ad service not available in web preview; ignore
       }
       
       // Create WhatsApp share URL with Play Store link
