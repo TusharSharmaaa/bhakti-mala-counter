@@ -173,11 +173,12 @@ class AdMobService {
         adId: AD_UNITS.banner,
         adSize: BannerAdSize.ADAPTIVE_BANNER,
         position: position === 'bottom' ? BannerAdPosition.BOTTOM_CENTER : BannerAdPosition.TOP_CENTER,
-        margin: 0,
+        margin: 64,
       };
 
       await AdMob.showBanner(options);
       this.bannerVisible = true;
+      try { document.body.classList.add('has-banner-ad'); } catch {}
       console.log('Banner ad shown (production)');
     } catch (error) {
       console.warn('Prod banner failed, retrying with TEST unit:', error);
@@ -189,6 +190,7 @@ class AdMobService {
           margin: 0,
         });
         this.bannerVisible = true;
+        try { document.body.classList.add('has-banner-ad'); } catch {}
         console.log('Banner ad shown (TEST)');
       } catch (e) {
         console.error('Failed to show banner (both prod and test):', e);
@@ -202,6 +204,7 @@ class AdMobService {
     try {
       await AdMob.hideBanner();
       this.bannerVisible = false;
+      try { document.body.classList.remove('has-banner-ad'); } catch {}
       console.log('Banner ad hidden');
     } catch (error) {
       console.error('Failed to hide banner:', error);
@@ -214,6 +217,7 @@ class AdMobService {
     try {
       await AdMob.removeBanner();
       this.bannerVisible = false;
+      try { document.body.classList.remove('has-banner-ad'); } catch {}
       console.log('Banner ad removed');
     } catch (error) {
       console.error('Failed to remove banner:', error);

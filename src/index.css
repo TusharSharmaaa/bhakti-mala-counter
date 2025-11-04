@@ -209,6 +209,11 @@ button:not(.unstyled) {
     padding-bottom: 140px; /* Navigation (64px) + Banner Ad (60px) + spacing */
   }
   
+  /* Move nav above system-anchored banner */
+  body.has-banner-ad .app-bottom-nav {
+    bottom: 60px;
+  }
+  
   /* Prevent duplicate hero circles */
   .hero-ring-secondary {
     display: none !important;

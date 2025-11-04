@@ -8,24 +8,13 @@ import { StreakData } from "@/lib/streak";
 import { getStreakStatusMessage, getStreakEmoji } from "@/lib/streak";
 import ShareStreakButton from "@/components/ShareStreakButton";
 import ProgressCalendar from "@/components/ProgressCalendar";
-import { useBannerAd, useRewardedAd, useInterstitialAd } from "@/hooks/useAdMob";
+
 
 const Stats = () => {
   const { counter, loading } = useCounter();
   const [streakData, setStreakData] = useState<StreakData | null>(null);
   const [streakLoading, setStreakLoading] = useState(true);
   
-  // AdMob integration
-  useBannerAd(true, 'bottom');
-  const { showForShareReward } = useRewardedAd();
-  
-  const handleShareComplete = async () => {
-    // Show rewarded ad after sharing
-    const watched = await showForShareReward();
-    if (watched) {
-      console.log('User watched rewarded ad after sharing!');
-    }
-  };
 
   useEffect(() => {
     loadStreakDataFromDB();
@@ -133,7 +122,6 @@ const Stats = () => {
                   currentStreak={streakData?.current_streak || 0}
                   longestStreak={streakData?.longest_streak || 0}
                   totalMalas={streakData?.total_malas || totalMalas}
-                  onShareComplete={handleShareComplete}
                 />
               </div>
             </div>

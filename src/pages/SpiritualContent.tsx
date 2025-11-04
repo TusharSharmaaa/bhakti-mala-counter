@@ -274,6 +274,7 @@ const SpiritualContent = () => {
                       content={showHindi ? currentQuote.quoteHindi : currentQuote.quote}
                       title="दिव्य वचन — श्री प्रेमानन्द महाराज"
                       className="sm:ml-auto"
+                      adMode="none"
                     />
                   </div>
                 </CardContent>
@@ -349,6 +350,7 @@ const SpiritualContent = () => {
                         }`}
                         title={`Chapter ${currentSlok.chapter} - Bhagavad Gita`}
                         className="sm:ml-auto"
+                        adMode="none"
                       />
                     )}
                   </div>

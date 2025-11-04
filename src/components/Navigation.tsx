@@ -13,7 +13,7 @@ const Navigation = () => {
   ];
   
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/50 backdrop-blur-sm bg-background/95">
+    <nav className="app-bottom-nav fixed bottom-0 left-0 right-0 z-50 border-t border-border/50 backdrop-blur-sm bg-background/95">
       <div className="container mx-auto px-4">
         <div className="flex justify-around items-center h-16">
           {navItems.map(({ path, icon: Icon, label }) => {

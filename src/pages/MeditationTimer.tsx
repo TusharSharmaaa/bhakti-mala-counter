@@ -141,6 +141,16 @@ const MeditationTimer = () => {
     if (navigator.vibrate) {
       navigator.vibrate([200, 100, 200, 100, 200]);
     }
+
+    // Show an interstitial after completion screen appears (non-blocking)
+    try {
+      const { getAdMobService, PLACEMENTS } = await import("@/services/admob");
+      const service = getAdMobService();
+      await service.initialize();
+      setTimeout(() => {
+        service.showInterstitial(PLACEMENTS.INT_TIMER_POST_SESSION).catch(() => {});
+      }, 300);
+    } catch {}
   };
 
   const playCompletionSound = () => {

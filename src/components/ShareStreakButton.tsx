@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Share2, Download, Loader2, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { DevotionalImageGenerator, StreakImageData } from "@/lib/imageGenerator";
+import { useRewardedAd } from "@/hooks/useAdMob";
 
 interface ShareStreakButtonProps {
   currentStreak: number;
@@ -16,6 +17,7 @@ const ShareStreakButton = ({ currentStreak, longestStreak, totalMalas, onShareCo
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string>("");
   const [showImageModal, setShowImageModal] = useState(false);
+  const { showForShareReward, isLoading } = useRewardedAd();
 
   // Motivational quotes based on streak
   const getMotivationalQuote = (streak: number): string => {
@@ -28,6 +30,11 @@ const ShareStreakButton = ({ currentStreak, longestStreak, totalMalas, onShareCo
   };
 
   const generateImage = async () => {
+    // Show a rewarded ad first. Proceed whether completed or skipped.
+    try {
+      await showForShareReward();
+    } catch {}
+
     setIsGenerating(true);
     
     try {
@@ -174,7 +181,7 @@ const ShareStreakButton = ({ currentStreak, longestStreak, totalMalas, onShareCo
     <>
       <Button
         onClick={generateImage}
-        disabled={isGenerating}
+        disabled={isGenerating || isLoading}
         className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-lg"
         size="lg"
       >

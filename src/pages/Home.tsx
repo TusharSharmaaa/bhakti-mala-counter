@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
 import { useCounter } from "@/hooks/useCounter";
 import { useWakeLock } from "@/hooks/useWakeLock";
-import { useBannerAd, useInterstitialAd } from "@/hooks/useAdMob";
+import { useBannerAd } from "@/hooks/useAdMob";
 
 const Home = () => {
   const { counter, loading: counterLoading, increment, decrement, reset } = useCounter();
@@ -15,7 +15,7 @@ const Home = () => {
   
   // AdMob integration
   useBannerAd(true, 'bottom'); // Show banner at bottom
-  const { showAfterMalaCompletion } = useInterstitialAd();
+  
 
   const handleCount = () => {
     increment();
@@ -27,8 +27,6 @@ const Home = () => {
       duration: 3000,
     });
     
-    // Try to show interstitial ad after mala completion
-    await showAfterMalaCompletion(counter.count);
   };
 
   const handleReset = () => {

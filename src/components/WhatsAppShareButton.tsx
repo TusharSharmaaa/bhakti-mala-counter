@@ -8,28 +8,31 @@ interface WhatsAppShareButtonProps {
   title?: string;
   onShareComplete?: () => void;
   className?: string;
+  adMode?: 'none' | 'interstitial';
 }
 
-const WhatsAppShareButton = ({ content, title = "Spiritual Content", onShareComplete, className = "" }: WhatsAppShareButtonProps) => {
+const WhatsAppShareButton = ({ content, title = "Spiritual Content", onShareComplete, className = "", adMode = 'interstitial' }: WhatsAppShareButtonProps) => {
   const handleWhatsAppShare = async () => {
     try {
-      // FIRST: Show interstitial ad and wait for it to complete
+      // FIRST: Show ad (if enabled)
       let adShown = false;
-      try {
-        const mod: any = await import("@/services/admob");
-        const getService = mod.getAdMobService || mod.default?.getAdMobService;
-        const placements = mod.PLACEMENTS;
-        if (getService && placements) {
-          const service = getService();
-          try { await service.initialize(); } catch {}
-          // Wait for ad to show and complete
-          await service.showInterstitial(placements.INT_CONTENT_EXIT || "share_whatsapp");
-          adShown = true;
-          // Give user a moment after ad closes
-          await new Promise(resolve => setTimeout(resolve, 500));
+      if (adMode !== 'none') {
+        try {
+          const mod: any = await import("@/services/admob");
+          const getService = mod.getAdMobService || mod.default?.getAdMobService;
+          const placements = mod.PLACEMENTS;
+          if (getService && placements) {
+            const service = getService();
+            try { await service.initialize(); } catch {}
+            // Wait for ad to show and complete
+            await service.showInterstitial(placements.INT_CONTENT_EXIT || "share_whatsapp");
+            adShown = true;
+            // Give user a moment after ad closes
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+        } catch (_) {
+          // Ad service not available in web preview; ignore
         }
-      } catch (_) {
-        // Ad service not available in web preview; ignore
       }
       
       // THEN: Create WhatsApp share URL with Play Store link
