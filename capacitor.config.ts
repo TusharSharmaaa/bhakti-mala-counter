@@ -9,8 +9,9 @@ const config: CapacitorConfig = {
   },
   plugins: {
     AdMob: {
-      // Test mode will be controlled via our ad service
-      // Production IDs will be set when you provide them
+      appId: {
+        android: 'ca-app-pub-2816806517862101~3158480561'
+      }
     }
   }
 };

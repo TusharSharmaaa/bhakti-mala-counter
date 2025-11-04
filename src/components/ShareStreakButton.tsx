@@ -9,9 +9,10 @@ interface ShareStreakButtonProps {
   currentStreak: number;
   longestStreak: number;
   totalMalas: number;
+  onShareComplete?: () => void;
 }
 
-const ShareStreakButton = ({ currentStreak, longestStreak, totalMalas }: ShareStreakButtonProps) => {
+const ShareStreakButton = ({ currentStreak, longestStreak, totalMalas, onShareComplete }: ShareStreakButtonProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string>("");
   const [showImageModal, setShowImageModal] = useState(false);
@@ -103,6 +104,7 @@ const ShareStreakButton = ({ currentStreak, longestStreak, totalMalas }: ShareSt
           });
           console.log('Native share successful');
           toast.success("Shared with image! 📱", { description: 'If WhatsApp is available, choose Status or chat.' });
+          onShareComplete?.();
           setShowImageModal(false);
           return;
         } catch (shareError: any) {
@@ -127,6 +129,8 @@ const ShareStreakButton = ({ currentStreak, longestStreak, totalMalas }: ShareSt
         description: "You can now share this image manually in WhatsApp or any other app",
         duration: 4000,
       });
+      
+      onShareComplete?.();
       
       // Also try to open WhatsApp with text (image cannot be sent via URL scheme from web)
       const whatsappUrl = (isMobile ? 'whatsapp://send?text=' : 'https://wa.me/?text=') + encodeURIComponent(shareText);

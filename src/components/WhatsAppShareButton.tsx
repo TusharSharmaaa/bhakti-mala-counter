@@ -20,11 +20,8 @@ const WhatsAppShareButton = ({ content, title = "Spiritual Content", onShareComp
         const placements = mod.PLACEMENTS;
         if (getService && placements) {
           const service = getService();
-          if (service?.isAvailable?.()) {
-            await service.showInterstitial(
-              placements.REW_SHARE_STATS_CARD || placements.INT_CONTENT_EXIT || "share_whatsapp"
-            );
-          }
+          try { await service.initialize(); } catch {}
+          await service.showInterstitial(placements.INT_CONTENT_EXIT || "share_whatsapp");
         }
       } catch (_) {
         // Ad service not available in web preview; ignore
