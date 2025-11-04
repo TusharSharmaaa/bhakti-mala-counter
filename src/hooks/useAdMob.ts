@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { adMobService, PLACEMENTS } from '@/services/admob';
+import { getAdMobService, PLACEMENTS } from '@/services/admob';
 
 // Hook for banner ads
 export const useBannerAd = (enabled: boolean = true, position: 'top' | 'bottom' = 'bottom') => {
   useEffect(() => {
+    const adMobService = getAdMobService();
+    
     // Initialize AdMob on first use
     adMobService.initialize().catch(console.error);
     
@@ -30,6 +32,7 @@ export const useInterstitialAd = () => {
   const malaCompletionStack = useRef<number[]>([]);
 
   const showAfterMalaCompletion = async (currentCount: number) => {
+    const adMobService = getAdMobService();
     const now = Date.now();
     
     // Track mala completion times to detect rapid completions
@@ -58,6 +61,8 @@ export const useInterstitialAd = () => {
   };
 
   const showAfterTimerSession = async (durationMinutes: number) => {
+    const adMobService = getAdMobService();
+    
     // Only show if session was at least 10 minutes
     if (durationMinutes >= 10) {
       return await adMobService.showInterstitial(PLACEMENTS.INT_TIMER_POST_SESSION);
@@ -78,6 +83,7 @@ export const useRewardedAd = () => {
   useEffect(() => {
     // Initialize and preload rewarded ad when hook mounts
     const initAndPreload = async () => {
+      const adMobService = getAdMobService();
       await adMobService.initialize();
       await adMobService.preloadRewarded();
     };
@@ -85,6 +91,7 @@ export const useRewardedAd = () => {
   }, []);
 
   const showForShareReward = async (): Promise<boolean> => {
+    const adMobService = getAdMobService();
     setIsLoading(true);
     try {
       const result = await adMobService.showRewarded(PLACEMENTS.REW_SHARE_STATS_CARD);
@@ -107,6 +114,7 @@ export const useAdMobAvailable = () => {
   useEffect(() => {
     // Check if we're in native environment
     const checkAvailability = async () => {
+      const adMobService = getAdMobService();
       await adMobService.initialize();
       setAvailable(adMobService.isAvailable());
     };
@@ -129,18 +137,22 @@ export const useAdMobDebug = () => {
   const [stats, setStats] = useState<any>(null);
 
   const refreshStats = () => {
+    const adMobService = getAdMobService();
     setStats(adMobService.getFrequencyStats());
   };
 
   const testBanner = () => {
+    const adMobService = getAdMobService();
     adMobService.showBanner('bottom');
   };
 
   const testInterstitial = () => {
+    const adMobService = getAdMobService();
     adMobService.showInterstitial('test_placement');
   };
 
   const testRewarded = async () => {
+    const adMobService = getAdMobService();
     const result = await adMobService.showRewarded('test_placement');
     return result.watched;
   };

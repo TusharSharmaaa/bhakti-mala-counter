@@ -7,7 +7,6 @@ import Navigation from "@/components/Navigation";
 import { toast } from "sonner";
 import { MeditationAudioEngine, SoundType } from "@/lib/meditationAudio";
 import { useBannerAd, useInterstitialAd } from "@/hooks/useAdMob";
-import { adMobService } from "@/services/admob";
 
 const MeditationTimer = () => {
   // Ensure page opens at top

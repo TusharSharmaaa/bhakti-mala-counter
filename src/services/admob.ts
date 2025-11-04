@@ -324,7 +324,14 @@ class AdMobService {
   }
 }
 
-export const adMobService = new AdMobService();
+let adMobServiceInstance: AdMobService | null = null;
+
+export const getAdMobService = (): AdMobService => {
+  if (!adMobServiceInstance) {
+    adMobServiceInstance = new AdMobService();
+  }
+  return adMobServiceInstance;
+};
 
 // Note: AdMob will be initialized lazily when first hook is used
 // This prevents interference with React initialization
