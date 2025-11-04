@@ -139,28 +139,6 @@ const Home = () => {
         </div>
       </main>
 
-      {/* Banner Ad Space - Visible in Web Preview */}
-      <div
-        className="fixed left-0 right-0 z-40 border-t-2 border-dashed border-primary/30"
-        style={{ bottom: '64px' }}
-        aria-label="Banner Ad Space"
-      >
-        <div
-          className="mx-auto flex items-center justify-center relative"
-          style={{
-            width: '100%',
-            maxWidth: '100%',
-            height: 50,
-            background: 'linear-gradient(135deg, #FDEBF7, #F9D8E9)'
-          }}
-        >
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-xs font-semibold text-primary/70 bg-white/80 px-3 py-1 rounded-full border border-primary/30">
-              📱 Banner Ad (320x50) - Counter Page
-            </span>
-          </div>
-        </div>
-      </div>
 
       <div className="pb-16" data-no-global-tap>
         <Navigation />

@@ -442,23 +442,6 @@ const SpiritualContent = () => {
         </Tabs>
       </main>
 
-      {/* Banner Ad Space */}
-      <div
-        className="fixed left-0 right-0 z-40 border-t-2 border-dashed border-primary/30"
-        style={{ bottom: '64px' }}
-      >
-        <div
-          className="flex items-center justify-center"
-          style={{
-            height: 50,
-            background: 'linear-gradient(135deg, #FDEBF7, #F9D8E9)'
-          }}
-        >
-          <span className="text-xs font-semibold text-primary/70 bg-white/80 px-3 py-1 rounded-full border border-primary/30">
-            📚 Banner Ad - Content Page | Native ads after each card
-          </span>
-        </div>
-      </div>
 
       <Navigation />
     </div>
