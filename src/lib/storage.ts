@@ -5,6 +5,7 @@ import { get, set, del } from 'idb-keyval';
  * Prevents counter data loss across sessions
  */
 
+
 export async function getItem<T>(key: string): Promise<T | null> {
   try {
     const value = await get<T>(key);
