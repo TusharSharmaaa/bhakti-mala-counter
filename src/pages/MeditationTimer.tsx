@@ -85,7 +85,37 @@ const MeditationTimer = () => {
     }
   }, [volume]);
 
-  const handleComplete = () => {
+  const handleStart = () => {
+    if (timeLeft > 0) {
+      setIsRunning(true);
+      sessionStartTime.current = Date.now();
+      
+      // Start background sound if enabled
+      if (soundEnabled && audioEngineRef.current) {
+        try {
+          audioEngineRef.current.setVolume(volume / 100);
+          audioEngineRef.current.play(backgroundSound);
+        } catch (error) {
+          console.warn('Failed to start background sound:', error);
+        }
+      }
+    }
+  };
+
+  const handlePause = () => {
+    setIsRunning(false);
+    
+    // Pause background sound
+    if (audioEngineRef.current) {
+      try {
+        audioEngineRef.current.stop();
+      } catch (error) {
+        console.warn('Failed to stop background sound:', error);
+      }
+    }
+  };
+
+  const handleComplete = async () => {
     setIsRunning(false);
     stopBackgroundSound();
     
@@ -93,6 +123,7 @@ const MeditationTimer = () => {
       description: "Radhe Radhe! Your meditation session is complete.",
       duration: 5000,
     });
+    
     // Notification API
     try {
       if ("Notification" in window) {
@@ -113,6 +144,10 @@ const MeditationTimer = () => {
     if (navigator.vibrate) {
       navigator.vibrate([200, 100, 200, 100, 200]);
     }
+    
+    // Try to show interstitial ad after timer session
+    const sessionDurationMinutes = Math.round((Date.now() - sessionStartTime.current) / 60000);
+    await showAfterTimerSession(sessionDurationMinutes);
   };
 
   const playCompletionSound = () => {

@@ -1,13 +1,14 @@
 import { AdMob, BannerAdOptions, BannerAdSize, BannerAdPosition, InterstitialAdPluginEvents, RewardAdPluginEvents, AdMobRewardItem } from '@capacitor-community/admob';
 
-// Ad Unit IDs - Replace these with your actual IDs when ready
+// Production Ad Unit IDs
 export const AD_UNITS = {
-  // Test IDs (will be replaced with production IDs)
-  banner: 'ca-app-pub-3940256099942544/6300978111', // Test banner
-  interstitial: 'ca-app-pub-3940256099942544/1033173712', // Test interstitial
-  rewarded: 'ca-app-pub-3940256099942544/5224354917', // Test rewarded
-  native: 'ca-app-pub-3940256099942544/2247696110', // Test native
+  banner: 'ca-app-pub-2816806517862101/8728062518',
+  interstitial: 'ca-app-pub-2816806517862101/2144781799',
+  rewarded: 'ca-app-pub-2816806517862101/1671699576',
+  native: 'ca-app-pub-2816806517862101/3747855119',
 };
+
+// App ID for AndroidManifest.xml: ca-app-pub-2816806517862101~3158480561
 
 // Placement IDs for tracking
 export const PLACEMENTS = {
