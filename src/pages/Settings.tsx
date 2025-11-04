@@ -2,21 +2,24 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Settings as SettingsIcon, Bell, Moon, Sun, Volume2, Info } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Moon, Sun, Volume2, Info, Smartphone } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
-import { useBannerAd } from "@/hooks/useAdMob";
+import { useBannerAd, useAdMobDebug, useAdMobAvailable } from "@/hooks/useAdMob";
 
 const Settings = () => {
   const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(false);
   const [soundFeedback, setSoundFeedback] = useState(true);
+  const [showAdDebug, setShowAdDebug] = useState(false);
   
   // AdMob integration
   useBannerAd(true, 'bottom');
+  const adAvailable = useAdMobAvailable();
+  const { stats, refreshStats, testBanner, testInterstitial, testRewarded } = useAdMobDebug();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('app_theme');
@@ -182,6 +185,65 @@ const Settings = () => {
               </button>
             </div>
           </CardContent>
+        </Card>
+
+        {/* Ad Debug Panel (Developer Mode) */}
+        <Card className="shadow-soft border-border/50 bg-primary/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 cursor-pointer" onClick={() => setShowAdDebug(!showAdDebug)}>
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <Smartphone className="h-4 w-4 text-primary" />
+              </div>
+              Ad Status (Tap to Toggle)
+            </CardTitle>
+          </CardHeader>
+          {showAdDebug && (
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between p-2 rounded bg-background/50">
+                  <span className="text-sm font-medium">AdMob Available:</span>
+                  <span className={cn("text-sm font-bold", adAvailable ? "text-green-600" : "text-red-600")}>
+                    {adAvailable ? "✓ YES (Native)" : "✗ NO (Web)"}
+                  </span>
+                </div>
+                
+                {stats && (
+                  <>
+                    <div className="flex items-center justify-between p-2 rounded bg-background/50">
+                      <span className="text-sm">Interstitials Today:</span>
+                      <span className="text-sm font-bold">{stats.shown_today} / {stats.max_per_day}</span>
+                    </div>
+                    <div className="flex items-center justify-between p-2 rounded bg-background/50">
+                      <span className="text-sm">Last Shown:</span>
+                      <span className="text-sm">{stats.last_shown > 0 ? new Date(stats.last_shown).toLocaleTimeString() : 'Never'}</span>
+                    </div>
+                    <div className="flex items-center justify-between p-2 rounded bg-background/50">
+                      <span className="text-sm">Cooldown:</span>
+                      <span className="text-sm">{Math.round(stats.cooldown_ms / 60000)} min</span>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {adAvailable && (
+                <div className="grid grid-cols-3 gap-2 pt-2 border-t">
+                  <Button size="sm" variant="outline" onClick={async () => { await testBanner(); await refreshStats(); toast.success("Banner test fired"); }}>
+                    Test Banner
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={async () => { await testInterstitial(); await refreshStats(); toast.success("Interstitial test fired"); }}>
+                    Test Int
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={async () => { const ok = await testRewarded(); await refreshStats(); toast.success(ok ? "Rewarded watched!" : "Rewarded skipped"); }}>
+                    Test Reward
+                  </Button>
+                </div>
+              )}
+              
+              <p className="text-xs text-muted-foreground text-center pt-2">
+                This panel helps debug ads on native builds. Web preview will always show "NO".
+              </p>
+            </CardContent>
+          )}
         </Card>
 
         {/* About */}
