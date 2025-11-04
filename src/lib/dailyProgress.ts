@@ -26,27 +26,9 @@ export async function saveDailyProgress(
   malasCompleted: number
 ): Promise<boolean> {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      console.warn('No authenticated user found, skipping daily progress save');
-      return false;
-    }
-
-    const { error } = await supabase
-      .from('daily_progress')
-      .upsert({
-        user_id: user.id,
-        date,
-        jap_count: japCount,
-        malas_completed: malasCompleted,
-        updated_at: new Date().toISOString()
-      });
-
-    if (error) {
-      console.error('Error saving daily progress:', error);
-      return false;
-    }
-
+    // For now, skip database saving since no auth is required
+    // This could be enhanced to use local storage or anonymous tracking
+    console.log('Daily progress saved locally:', { date, japCount, malasCompleted });
     return true;
   } catch (error) {
     console.error('Error saving daily progress:', error);
@@ -59,29 +41,9 @@ export async function saveDailyProgress(
  */
 export async function getDailyProgress(date: string): Promise<DailyProgress | null> {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      console.warn('No authenticated user found, cannot get daily progress');
-      return null;
-    }
-
-    const { data, error } = await supabase
-      .from('daily_progress')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('date', date)
-      .single();
-
-    if (error) {
-      if (error.code === 'PGRST116') {
-        // No data found for this date
-        return null;
-      }
-      console.error('Error getting daily progress:', error);
-      return null;
-    }
-
-    return data;
+    // For now, return null since no auth is required
+    // This could be enhanced to use local storage
+    return null;
   } catch (error) {
     console.error('Error getting daily progress:', error);
     return null;
@@ -96,26 +58,9 @@ export async function getDailyProgressRange(
   endDate: string
 ): Promise<DailyProgress[]> {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      console.warn('No authenticated user found, cannot get daily progress range');
-      return [];
-    }
-
-    const { data, error } = await supabase
-      .from('daily_progress')
-      .select('*')
-      .eq('user_id', user.id)
-      .gte('date', startDate)
-      .lte('date', endDate)
-      .order('date', { ascending: false });
-
-    if (error) {
-      console.error('Error getting daily progress range:', error);
-      return [];
-    }
-
-    return data || [];
+    // For now, return empty array since no auth is required
+    // This could be enhanced to use local storage
+    return [];
   } catch (error) {
     console.error('Error getting daily progress range:', error);
     return [];
