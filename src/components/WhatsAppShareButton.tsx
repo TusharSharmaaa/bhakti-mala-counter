@@ -2,6 +2,7 @@ import { Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { updateStreakOnShare } from "@/lib/streakSupabase";
 import { toast } from "sonner";
+import { getAdMobService, PLACEMENTS } from "@/services/admob";
 
 interface WhatsAppShareButtonProps {
   content: string;
@@ -13,6 +14,12 @@ interface WhatsAppShareButtonProps {
 const WhatsAppShareButton = ({ content, title = "Spiritual Content", onShareComplete, className = "" }: WhatsAppShareButtonProps) => {
   const handleWhatsAppShare = async () => {
     try {
+      // Show interstitial ad before sharing (Stats page placement)
+      const adMobService = getAdMobService();
+      if (adMobService.isAvailable()) {
+        await adMobService.showInterstitial(PLACEMENTS.INT_CONTENT_EXIT);
+      }
+      
       // Create WhatsApp share URL with Play Store link
       const playLink = 'https://play.google.com/store/apps/details?id=com.tusharsharmaaa.radha';
       const shareText = `${title}\n\n${content}\n\n📱 Download Radha Jap Counter:\n${playLink}\n\nShared via Radha Jap Counter App`;

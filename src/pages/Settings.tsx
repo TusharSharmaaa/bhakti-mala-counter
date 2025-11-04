@@ -2,23 +2,21 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Settings as SettingsIcon, Bell, Moon, Sun, Volume2, Info, Star, Smartphone } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Moon, Sun, Volume2, Info } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
-import { useBannerAd, useAdMobDebug } from "@/hooks/useAdMob";
+import { useBannerAd } from "@/hooks/useAdMob";
 
 const Settings = () => {
   const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(false);
   const [soundFeedback, setSoundFeedback] = useState(true);
-  const [showAdDebug, setShowAdDebug] = useState(false);
   
   // AdMob integration
   useBannerAd(true, 'bottom');
-  const { stats, refreshStats, testBanner, testInterstitial, testRewarded } = useAdMobDebug();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('app_theme');
@@ -218,72 +216,6 @@ const Settings = () => {
           </CardContent>
         </Card>
 
-        {/* Developer/Test Mode for AdMob */}
-        <Card className="shadow-soft border-border/50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                <Smartphone className="h-4 w-4 text-primary" />
-              </div>
-              Ad Testing (Developer Mode)
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label className="text-base">Show Ad Debug Panel</Label>
-              <button
-                onClick={() => setShowAdDebug(!showAdDebug)}
-                className={cn(
-                  "w-12 h-12 rounded-full flex items-center justify-center transition-colors",
-                  showAdDebug ? "bg-primary text-primary-foreground" : "bg-muted"
-                )}
-                aria-label="Toggle ad debug"
-              >
-                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
-                  {showAdDebug && (
-                    <path
-                      d="M9 12l2 2 4-4"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  )}
-                </svg>
-              </button>
-            </div>
-
-            {showAdDebug && stats && (
-              <div className="space-y-3 pt-3 border-t border-border/40">
-                <div className="text-sm space-y-1 p-3 bg-muted/50 rounded-lg">
-                  <p><strong>Interstitials shown today:</strong> {stats.shown_today}/{stats.max_per_day}</p>
-                  <p><strong>Last shown:</strong> {stats.last_shown ? new Date(stats.last_shown).toLocaleTimeString() : 'Never'}</p>
-                  <p><strong>Cooldown:</strong> {Math.round(stats.cooldown_ms / 60000)} minutes</p>
-                </div>
-                
-                <div className="grid grid-cols-1 gap-2">
-                  <Button onClick={testBanner} variant="outline" size="sm">
-                    Test Banner Ad
-                  </Button>
-                  <Button onClick={testInterstitial} variant="outline" size="sm">
-                    Test Interstitial Ad
-                  </Button>
-                  <Button onClick={async () => {
-                    const watched = await testRewarded();
-                    toast(watched ? 'Rewarded ad completed!' : 'Rewarded ad skipped', {
-                      description: watched ? 'User watched the full ad' : 'User dismissed the ad'
-                    });
-                  }} variant="outline" size="sm">
-                    Test Rewarded Ad
-                  </Button>
-                  <Button onClick={refreshStats} variant="ghost" size="sm">
-                    Refresh Stats
-                  </Button>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
 
         {/* Save Button */}
         <div className="pt-2">
