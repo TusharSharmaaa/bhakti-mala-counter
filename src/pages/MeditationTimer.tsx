@@ -6,7 +6,7 @@ import { Play, Pause, RotateCcw, Volume2, VolumeX } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { toast } from "sonner";
 import { MeditationAudioEngine, SoundType } from "@/lib/meditationAudio";
-import { useBannerAd, useInterstitialAd } from "@/hooks/useAdMob";
+// No AdMob imports - meditation page is ad-free
 
 const MeditationTimer = () => {
   // Ensure page opens at top
@@ -21,9 +21,7 @@ const MeditationTimer = () => {
   const audioEngineRef = useRef<MeditationAudioEngine | null>(null);
   const sessionStartTime = useRef<number>(0);
   
-  // AdMob integration - hide banner during active meditation
-  useBannerAd(!isRunning, 'bottom');
-  const { showAfterTimerSession } = useInterstitialAd();
+  // No ads on meditation page - peaceful environment
 
   // Initialize audio engine
   useEffect(() => {
@@ -143,10 +141,6 @@ const MeditationTimer = () => {
     if (navigator.vibrate) {
       navigator.vibrate([200, 100, 200, 100, 200]);
     }
-    
-    // Try to show interstitial ad after timer session
-    const sessionDurationMinutes = Math.round((Date.now() - sessionStartTime.current) / 60000);
-    await showAfterTimerSession(sessionDurationMinutes);
   };
 
   const playCompletionSound = () => {
@@ -231,7 +225,7 @@ const MeditationTimer = () => {
   const progress = ((duration * 60 - timeLeft) / (duration * 60)) * 100;
 
   return (
-    <div className="min-h-screen gradient-peaceful pb-20">
+    <div className="min-h-screen gradient-peaceful pb-20"> {/* No extra spacing - no banner ads */}
       <header className="border-b border-border/50 backdrop-blur-sm bg-background/50">
         <div className="container mx-auto px-4 py-4">
           <h1 className="text-2xl font-bold text-primary">Meditation Timer — भक्ति में ध्यान, ध्यान में शांति।</h1>

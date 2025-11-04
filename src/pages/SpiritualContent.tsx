@@ -197,7 +197,7 @@ const SpiritualContent = () => {
   };
 
   return (
-    <div className="min-h-screen gradient-peaceful pb-20">
+    <div className="min-h-screen gradient-peaceful page-bottom-spacing">
       {/* Header */}
       <motion.header
         initial={{ opacity: 0, y: -20 }}
@@ -279,17 +279,6 @@ const SpiritualContent = () => {
                 </CardContent>
               </Card>
             </motion.div>
-            {/* Native Ad Space - Appears after every content card */}
-            <div className="w-full border-2 border-dashed border-primary/30 rounded-lg overflow-hidden" aria-label="Native Ad Space">
-              <div
-                className="flex items-center justify-center"
-                style={{ width: '100%', height: 120, background: 'linear-gradient(135deg, #FDEBF7, #F9D8E9)' }}
-              >
-                <span className="text-xs font-semibold text-primary/70 bg-white/80 px-3 py-1 rounded-full border border-primary/30">
-                  📰 Native Ad (280x120) - After Quote Cards
-                </span>
-              </div>
-            </div>
           </TabsContent>
 
           {/* --- Gita Tab (Dynamic from API) --- */}
@@ -366,17 +355,6 @@ const SpiritualContent = () => {
                 </CardContent>
               </Card>
             </motion.div>
-            {/* Native Ad Space - After Gita */}
-            <div className="w-full border-2 border-dashed border-primary/30 rounded-lg overflow-hidden" aria-label="Native Ad Space">
-              <div
-                className="flex items-center justify-center"
-                style={{ width: '100%', height: 120, background: 'linear-gradient(135deg, #FDEBF7, #F9D8E9)' }}
-              >
-                <span className="text-xs font-semibold text-primary/70 bg-white/80 px-3 py-1 rounded-full border border-primary/30">
-                  📰 Native Ad (280x120) - After Gita
-                </span>
-              </div>
-            </div>
           </TabsContent>
 
           {/* --- Stories Tab --- */}
@@ -427,17 +405,6 @@ const SpiritualContent = () => {
                 </CardContent>
               </Card>
             </motion.div>
-            {/* Native Ad Space - After Stories */}
-            <div className="w-full border-2 border-dashed border-primary/30 rounded-lg overflow-hidden" aria-label="Native Ad Space">
-              <div
-                className="flex items-center justify-center"
-                style={{ width: '100%', height: 120, background: 'linear-gradient(135deg, #FDEBF7, #F9D8E9)' }}
-              >
-                <span className="text-xs font-semibold text-primary/70 bg-white/80 px-3 py-1 rounded-full border border-primary/30">
-                  📰 Native Ad (280x120) - After Stories
-                </span>
-              </div>
-            </div>
           </TabsContent>
         </Tabs>
       </main>

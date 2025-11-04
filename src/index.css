@@ -204,6 +204,11 @@ button:not(.unstyled) {
     padding-left: max(16px, env(safe-area-inset-left));
   }
   
+  /* Bottom spacing for banner ads + navigation */
+  .page-bottom-spacing {
+    padding-bottom: 140px; /* Navigation (64px) + Banner Ad (60px) + spacing */
+  }
+  
   /* Prevent duplicate hero circles */
   .hero-ring-secondary {
     display: none !important;

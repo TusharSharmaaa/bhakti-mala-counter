@@ -66,7 +66,7 @@ const Home = () => {
 
   return (
     <div
-      className="min-h-screen gradient-peaceful relative overflow-hidden pb-40 safe-padding"
+      className="min-h-screen gradient-peaceful relative overflow-hidden page-bottom-spacing safe-padding"
       onClick={handleGlobalTap}
       style={{
         backgroundImage: "linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.6)), url(/images/background-Image.png)",

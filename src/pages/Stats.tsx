@@ -60,7 +60,7 @@ const Stats = () => {
   }
 
   return (
-    <div className="min-h-screen gradient-peaceful pb-20">
+    <div className="min-h-screen gradient-peaceful page-bottom-spacing">
       <header className="border-b border-border/50 backdrop-blur-sm bg-background/50">
         <div className="container mx-auto px-4 py-4">
           <div>
