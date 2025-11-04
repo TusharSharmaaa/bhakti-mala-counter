@@ -149,15 +149,16 @@ class AdMobService {
     try {
       await AdMob.initialize({
         // requestTrackingAuthorization will be handled automatically
-        testingDevices: [], // Add device IDs for testing
-        initializeForTesting: false, // Set to true during development
+        testingDevices: [], // Empty for production
+        initializeForTesting: false, // MUST be false for production
       });
 
       this.initialized = true;
-      console.log('AdMob initialized successfully');
+      console.log('AdMob initialized successfully (PRODUCTION MODE)');
 
       // Preload ads in background
       this.preloadInterstitial();
+      this.preloadRewarded();
       
     } catch (error) {
       console.error('Failed to initialize AdMob:', error);

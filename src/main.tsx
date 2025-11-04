@@ -2,6 +2,22 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import { ADS_ENABLED } from "./config/ads";
+
+// Initialize AdMob on app startup (only in native environment)
+(async () => {
+  if (!ADS_ENABLED) return;
+  
+  try {
+    const { getAdMobService } = await import('./services/admob');
+    const service = getAdMobService();
+    await service.initialize();
+    console.log('AdMob initialized on app startup');
+  } catch (error) {
+    // AdMob not available (web preview), silently ignore
+    console.log('AdMob not available in this environment');
+  }
+})();
 
 // Register service worker for PWA
 if ('serviceWorker' in navigator) {
