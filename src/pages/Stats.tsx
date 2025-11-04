@@ -8,11 +8,15 @@ import { StreakData } from "@/lib/streak";
 import { getStreakStatusMessage, getStreakEmoji } from "@/lib/streak";
 import ShareStreakButton from "@/components/ShareStreakButton";
 import ProgressCalendar from "@/components/ProgressCalendar";
+import { useBannerAd, useRewardedAd } from "@/hooks/useAdMob";
 
 const Stats = () => {
   const { counter, loading } = useCounter();
   const [streakData, setStreakData] = useState<StreakData | null>(null);
   const [streakLoading, setStreakLoading] = useState(true);
+  
+  // AdMob integration
+  useBannerAd(true, 'bottom');
 
   useEffect(() => {
     loadStreakDataFromDB();

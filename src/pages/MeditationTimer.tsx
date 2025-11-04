@@ -6,6 +6,8 @@ import { Play, Pause, RotateCcw, Volume2, VolumeX } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { toast } from "sonner";
 import { MeditationAudioEngine, SoundType } from "@/lib/meditationAudio";
+import { useBannerAd, useInterstitialAd } from "@/hooks/useAdMob";
+import { adMobService } from "@/services/admob";
 
 const MeditationTimer = () => {
   // Ensure page opens at top
@@ -18,6 +20,11 @@ const MeditationTimer = () => {
   const [volume, setVolume] = useState(30);
   const intervalRef = useRef<number>();
   const audioEngineRef = useRef<MeditationAudioEngine | null>(null);
+  const sessionStartTime = useRef<number>(0);
+  
+  // AdMob integration - hide banner during active meditation
+  useBannerAd(!isRunning, 'bottom');
+  const { showAfterTimerSession } = useInterstitialAd();
 
   // Initialize audio engine
   useEffect(() => {

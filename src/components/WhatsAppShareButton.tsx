@@ -13,9 +13,9 @@ interface WhatsAppShareButtonProps {
 const WhatsAppShareButton = ({ content, title = "Spiritual Content", onShareComplete, className = "" }: WhatsAppShareButtonProps) => {
   const handleWhatsAppShare = async () => {
     try {
-      // Create WhatsApp share URL
+      // Create WhatsApp share URL with Play Store link
       const playLink = 'https://play.google.com/store/apps/details?id=com.tusharsharmaaa.radha';
-      const shareText = `${title}\n\n${content}\n\nDownload the app:\n${playLink}\n\nShared via Radha Jap Counter App`;
+      const shareText = `${title}\n\n${content}\n\n📱 Download Radha Jap Counter:\n${playLink}\n\nShared via Radha Jap Counter App`;
       const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
       
       // Open WhatsApp share

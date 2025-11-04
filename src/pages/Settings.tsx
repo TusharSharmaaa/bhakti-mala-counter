@@ -2,18 +2,24 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Settings as SettingsIcon, Bell, Moon, Sun, Volume2, Info, Star } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Moon, Sun, Volume2, Info, Star, Smartphone } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
+import { useBannerAd, useAdMobDebug } from "@/hooks/useAdMob";
 
 const Settings = () => {
   const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(false);
   const [soundFeedback, setSoundFeedback] = useState(true);
+  const [showAdDebug, setShowAdDebug] = useState(false);
   // language setting removed per latest spec; keeping placeholder state if needed later
+  
+  // AdMob integration
+  useBannerAd(true, 'bottom');
+  const { stats, refreshStats, testBanner, testInterstitial, testRewarded } = useAdMobDebug();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('app_theme');

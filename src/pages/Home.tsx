@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
 import { useCounter } from "@/hooks/useCounter";
 import { useWakeLock } from "@/hooks/useWakeLock";
+import { useBannerAd, useInterstitialAd } from "@/hooks/useAdMob";
 
 const Home = () => {
   const { counter, loading: counterLoading, increment, decrement, reset } = useCounter();
@@ -11,16 +12,23 @@ const Home = () => {
 
   // Keep screen awake during japa
   useWakeLock(true);
+  
+  // AdMob integration
+  useBannerAd(true, 'bottom'); // Show banner at bottom
+  const { showAfterMalaCompletion } = useInterstitialAd();
 
   const handleCount = () => {
     increment();
   };
 
-  const handleMalaComplete = () => {
+  const handleMalaComplete = async () => {
     toast.success("🎉 Mala Complete!", {
       description: `Radhe Radhe! ${malas + 1} mala${malas + 1 > 1 ? 's' : ''} completed with devotion.`,
       duration: 3000,
     });
+    
+    // Try to show interstitial ad after mala completion
+    await showAfterMalaCompletion(counter.count);
   };
 
   const handleReset = () => {
