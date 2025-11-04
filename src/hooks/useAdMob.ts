@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import * as React from 'react';
 import { ADS_ENABLED } from '@/config/ads';
 
 // Safe hooks that use dynamic imports to avoid crashes in web preview
@@ -73,7 +72,7 @@ export function useInterstitialAd() {
 
 // Hook for rewarded ads
 export function useRewardedAd() {
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const mountedRef = useRef(false);
 
   useEffect(() => {
@@ -112,7 +111,7 @@ export function useRewardedAd() {
 
 // Check if AdMob is available (native environment)
 export function useAdMobAvailable() {
-  const [available, setAvailable] = React.useState(false);
+  const [available, setAvailable] = useState(false);
   const mountedRef = useRef(false);
 
   useEffect(() => {
@@ -136,7 +135,7 @@ export function useAdMobAvailable() {
 
 // Developer/testing hook for manually triggering ads
 export function useAdMobDebug() {
-  const [stats, setStats] = React.useState<any>(null);
+  const [stats, setStats] = useState<any>(null);
   const mountedRef = useRef(false);
 
   const refreshStats = async () => {
