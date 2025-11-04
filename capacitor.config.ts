@@ -5,7 +5,6 @@ const config: CapacitorConfig = {
   appName: 'Radha Jap Counter',
   webDir: 'dist',
   server: {
-    url: 'https://dad075f2-422b-44d7-8913-0ce42c2d47ef.lovableproject.com?forceHideBadge=true',
     cleartext: true
   },
   plugins: {
