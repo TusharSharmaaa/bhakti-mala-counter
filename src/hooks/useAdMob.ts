@@ -4,10 +4,18 @@ import { adMobService, PLACEMENTS } from '@/services/admob';
 // Hook for banner ads
 export const useBannerAd = (enabled: boolean = true, position: 'top' | 'bottom' = 'bottom') => {
   useEffect(() => {
+    // Initialize AdMob on first use
+    adMobService.initialize().catch(console.error);
+    
     if (!enabled) return;
 
     // Show banner when component mounts
-    adMobService.showBanner(position);
+    const showBannerAsync = async () => {
+      await adMobService.initialize();
+      await adMobService.showBanner(position);
+    };
+    
+    showBannerAsync().catch(console.error);
 
     // Hide banner when component unmounts
     return () => {
@@ -68,8 +76,12 @@ export const useRewardedAd = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Preload rewarded ad when hook mounts
-    adMobService.preloadRewarded();
+    // Initialize and preload rewarded ad when hook mounts
+    const initAndPreload = async () => {
+      await adMobService.initialize();
+      await adMobService.preloadRewarded();
+    };
+    initAndPreload().catch(console.error);
   }, []);
 
   const showForShareReward = async (): Promise<boolean> => {
@@ -94,14 +106,17 @@ export const useAdMobAvailable = () => {
 
   useEffect(() => {
     // Check if we're in native environment
-    const checkAvailability = () => {
+    const checkAvailability = async () => {
+      await adMobService.initialize();
       setAvailable(adMobService.isAvailable());
     };
 
-    checkAvailability();
+    checkAvailability().catch(console.error);
     
     // Re-check after a delay in case initialization is slow
-    const timer = setTimeout(checkAvailability, 1000);
+    const timer = setTimeout(() => {
+      checkAvailability().catch(console.error);
+    }, 1000);
     
     return () => clearTimeout(timer);
   }, []);

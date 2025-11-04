@@ -326,8 +326,5 @@ class AdMobService {
 
 export const adMobService = new AdMobService();
 
-// Initialize on module load
-if (typeof window !== 'undefined') {
-  // Initialize AdMob when app starts
-  adMobService.initialize();
-}
+// Note: AdMob will be initialized lazily when first hook is used
+// This prevents interference with React initialization
