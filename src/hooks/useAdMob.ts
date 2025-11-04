@@ -1,171 +1,194 @@
 import { useEffect, useRef, useState } from 'react';
-import { getAdMobService, PLACEMENTS } from '@/services/admob';
+import * as React from 'react';
+
+// Safe hooks that use dynamic imports to avoid crashes in web preview
+// AdMob only works in native Android/iOS builds
 
 // Hook for banner ads
-export const useBannerAd = (enabled: boolean = true, position: 'top' | 'bottom' = 'bottom') => {
+export function useBannerAd(enabled: boolean, position: 'top' | 'bottom' = 'bottom') {
+  const mountedRef = useRef(false);
+  
   useEffect(() => {
-    const adMobService = getAdMobService();
+    if (mountedRef.current) return;
+    mountedRef.current = true;
     
-    // Initialize AdMob on first use
-    adMobService.initialize().catch(console.error);
+    let cleanup: (() => void) | undefined;
     
-    if (!enabled) return;
+    (async () => {
+      if (!enabled) return;
+      
+      try {
+        const { getAdMobService } = await import('@/services/admob');
+        const service = getAdMobService();
+        
+        await service.initialize();
+        await service.showBanner(position);
+        
+        cleanup = () => {
+          service.hideBanner().catch(() => {});
+        };
+      } catch (error) {
+        // AdMob not available (web preview), silently ignore
+      }
+    })();
 
-    // Show banner when component mounts
-    const showBannerAsync = async () => {
-      await adMobService.initialize();
-      await adMobService.showBanner(position);
-    };
-    
-    showBannerAsync().catch(console.error);
-
-    // Hide banner when component unmounts
     return () => {
-      adMobService.hideBanner();
+      cleanup?.();
     };
   }, [enabled, position]);
-};
+}
 
-// Hook for interstitial ads with smart triggering
-export const useInterstitialAd = () => {
-  const lastTriggerTime = useRef(0);
-  const malaCompletionStack = useRef<number[]>([]);
-
+// Hook for interstitial ads with smart frequency management
+export function useInterstitialAd() {
   const showAfterMalaCompletion = async (currentCount: number) => {
-    const adMobService = getAdMobService();
-    const now = Date.now();
-    
-    // Track mala completion times to detect rapid completions
-    malaCompletionStack.current.push(now);
-    
-    // Keep only last 3 completions
-    if (malaCompletionStack.current.length > 3) {
-      malaCompletionStack.current.shift();
-    }
+    const malasCompleted = Math.floor(currentCount / 108);
+    if (malasCompleted % 3 !== 0) return false;
 
-    // Check if user completed multiple malas within 10 seconds (skip ad in this case)
-    const recentCompletions = malaCompletionStack.current.filter(time => now - time < 10000);
-    if (recentCompletions.length > 1) {
-      console.log('Multiple malas completed quickly, skipping interstitial');
+    try {
+      const { getAdMobService, PLACEMENTS } = await import('@/services/admob');
+      const service = getAdMobService();
+      await service.initialize();
+      return await service.showInterstitial(PLACEMENTS.INT_AFTER_3_MALAS);
+    } catch {
       return false;
     }
-
-    // Check if this is a multiple of 3 malas (324 = 3*108)
-    const malasCompleted = Math.floor(currentCount / 108);
-    if (malasCompleted % 3 === 0 && malasCompleted > 0) {
-      // Show interstitial after mala completion
-      return await adMobService.showInterstitial(PLACEMENTS.INT_AFTER_3_MALAS);
-    }
-
-    return false;
   };
 
   const showAfterTimerSession = async (durationMinutes: number) => {
-    const adMobService = getAdMobService();
-    
-    // Only show if session was at least 10 minutes
-    if (durationMinutes >= 10) {
-      return await adMobService.showInterstitial(PLACEMENTS.INT_TIMER_POST_SESSION);
+    if (durationMinutes < 10) return false;
+
+    try {
+      const { getAdMobService, PLACEMENTS } = await import('@/services/admob');
+      const service = getAdMobService();
+      await service.initialize();
+      return await service.showInterstitial(PLACEMENTS.INT_TIMER_POST_SESSION);
+    } catch {
+      return false;
     }
-    return false;
   };
 
-  return {
-    showAfterMalaCompletion,
-    showAfterTimerSession,
-  };
-};
+  return { showAfterMalaCompletion, showAfterTimerSession };
+}
 
 // Hook for rewarded ads
-export const useRewardedAd = () => {
-  const [isLoading, setIsLoading] = useState(false);
+export function useRewardedAd() {
+  const [isLoading, setIsLoading] = React.useState(false);
+  const mountedRef = useRef(false);
 
   useEffect(() => {
-    // Initialize and preload rewarded ad when hook mounts
-    const initAndPreload = async () => {
-      const adMobService = getAdMobService();
-      await adMobService.initialize();
-      await adMobService.preloadRewarded();
-    };
-    initAndPreload().catch(console.error);
+    if (mountedRef.current) return;
+    mountedRef.current = true;
+
+    (async () => {
+      try {
+        const { getAdMobService } = await import('@/services/admob');
+        const service = getAdMobService();
+        await service.initialize();
+        await service.preloadRewarded();
+      } catch {
+        // Ignore in web preview
+      }
+    })();
   }, []);
 
   const showForShareReward = async (): Promise<boolean> => {
-    const adMobService = getAdMobService();
     setIsLoading(true);
     try {
-      const result = await adMobService.showRewarded(PLACEMENTS.REW_SHARE_STATS_CARD);
+      const { getAdMobService, PLACEMENTS } = await import('@/services/admob');
+      const service = getAdMobService();
+      await service.initialize();
+      const result = await service.showRewarded(PLACEMENTS.REW_SHARE_STATS_CARD);
       return result.watched;
+    } catch {
+      return false;
     } finally {
       setIsLoading(false);
     }
   };
 
-  return {
-    showForShareReward,
-    isLoading,
-  };
-};
+  return { showForShareReward, isLoading };
+}
 
-// Hook for checking AdMob availability
-export const useAdMobAvailable = () => {
-  const [available, setAvailable] = useState(false);
+// Check if AdMob is available (native environment)
+export function useAdMobAvailable() {
+  const [available, setAvailable] = React.useState(false);
+  const mountedRef = useRef(false);
 
   useEffect(() => {
-    // Check if we're in native environment
-    const checkAvailability = async () => {
-      const adMobService = getAdMobService();
-      await adMobService.initialize();
-      setAvailable(adMobService.isAvailable());
-    };
+    if (mountedRef.current) return;
+    mountedRef.current = true;
 
-    checkAvailability().catch(console.error);
-    
-    // Re-check after a delay in case initialization is slow
-    const timer = setTimeout(() => {
-      checkAvailability().catch(console.error);
-    }, 1000);
-    
-    return () => clearTimeout(timer);
+    (async () => {
+      try {
+        const { getAdMobService } = await import('@/services/admob');
+        const service = getAdMobService();
+        await service.initialize();
+        setAvailable(service.isAvailable());
+      } catch {
+        setAvailable(false);
+      }
+    })();
   }, []);
 
   return available;
-};
+}
 
-// Developer hook for testing ads
-export const useAdMobDebug = () => {
-  const [stats, setStats] = useState<any>(null);
+// Developer/testing hook for manually triggering ads
+export function useAdMobDebug() {
+  const [stats, setStats] = React.useState<any>(null);
+  const mountedRef = useRef(false);
 
-  const refreshStats = () => {
-    const adMobService = getAdMobService();
-    setStats(adMobService.getFrequencyStats());
-  };
-
-  const testBanner = () => {
-    const adMobService = getAdMobService();
-    adMobService.showBanner('bottom');
-  };
-
-  const testInterstitial = () => {
-    const adMobService = getAdMobService();
-    adMobService.showInterstitial('test_placement');
-  };
-
-  const testRewarded = async () => {
-    const adMobService = getAdMobService();
-    const result = await adMobService.showRewarded('test_placement');
-    return result.watched;
+  const refreshStats = async () => {
+    try {
+      const { getAdMobService } = await import('@/services/admob');
+      const service = getAdMobService();
+      const currentStats = service.getFrequencyStats();
+      setStats(currentStats);
+    } catch {
+      // Ignore
+    }
   };
 
   useEffect(() => {
+    if (mountedRef.current) return;
+    mountedRef.current = true;
     refreshStats();
   }, []);
 
-  return {
-    stats,
-    refreshStats,
-    testBanner,
-    testInterstitial,
-    testRewarded,
+  const testBanner = async () => {
+    try {
+      const { getAdMobService } = await import('@/services/admob');
+      const service = getAdMobService();
+      await service.initialize();
+      await service.showBanner('bottom');
+    } catch (error) {
+      console.error('Test banner failed:', error);
+    }
   };
-};
+
+  const testInterstitial = async () => {
+    try {
+      const { getAdMobService } = await import('@/services/admob');
+      const service = getAdMobService();
+      await service.initialize();
+      await service.showInterstitial('test_manual');
+    } catch (error) {
+      console.error('Test interstitial failed:', error);
+    }
+  };
+
+  const testRewarded = async (): Promise<boolean> => {
+    try {
+      const { getAdMobService } = await import('@/services/admob');
+      const service = getAdMobService();
+      await service.initialize();
+      const result = await service.showRewarded('test_manual_rewarded');
+      return result.watched;
+    } catch (error) {
+      console.error('Test rewarded failed:', error);
+      return false;
+    }
+  };
+
+  return { stats, refreshStats, testBanner, testInterstitial, testRewarded };
+}

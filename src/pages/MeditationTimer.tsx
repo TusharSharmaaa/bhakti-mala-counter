@@ -416,23 +416,24 @@ const MeditationTimer = () => {
         </Card>
       </main>
 
-      {/* Flush, full-width banner just above bottom navigation */}
+      {/* Banner Ad Space - Hidden during meditation, shown when idle */}
       <div
-        className="fixed left-0 right-0 z-40"
+        className="fixed left-0 right-0 z-40 border-t-2 border-dashed border-primary/30"
         style={{ bottom: '64px' }}
-        aria-label="Ad banner"
       >
         <div
-          className="mx-auto"
+          className="flex items-center justify-center"
           style={{
-            width: '100%',
-            maxWidth: '100%',
             height: 50,
-            marginTop: 8,
-            marginBottom: 0,
-            background: 'linear-gradient(135deg, #FDEBF7, #F9D8E9)'
+            background: isRunning 
+              ? 'linear-gradient(135deg, #f0f0f0, #e0e0e0)' 
+              : 'linear-gradient(135deg, #FDEBF7, #F9D8E9)'
           }}
-        />
+        >
+          <span className="text-xs font-semibold text-primary/70 bg-white/80 px-3 py-1 rounded-full border border-primary/30">
+            {isRunning ? '🔇 Ad Hidden (Meditating)' : '🧘 Banner Ad - Timer | Interstitial after 10+ min'}
+          </span>
+        </div>
       </div>
 
       <Navigation />
