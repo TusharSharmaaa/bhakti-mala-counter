@@ -8,6 +8,7 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Terms from "./pages/Terms";
+import AdBanner from "./components/AdBanner";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,8 @@ const App = () => (
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
+      {/* Persistent bottom banner ad across the app */}
+      <AdBanner />
     </BrowserRouter>
   </QueryClientProvider>
 );

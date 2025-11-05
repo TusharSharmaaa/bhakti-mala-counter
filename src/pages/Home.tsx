@@ -4,7 +4,6 @@ import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
 import { useCounter } from "@/hooks/useCounter";
 import { useWakeLock } from "@/hooks/useWakeLock";
-import { useBannerAd } from "@/hooks/useAdMob";
 
 const Home = () => {
   const { counter, loading: counterLoading, increment, decrement, reset } = useCounter();
@@ -13,10 +12,7 @@ const Home = () => {
   // Keep screen awake during japa
   useWakeLock(true);
   
-  // AdMob integration
-  useBannerAd(true, 'bottom'); // Show banner at bottom
-  
-
+  // AdMob integration now handled globally
   const handleCount = () => {
     increment();
   };

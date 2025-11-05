@@ -7,7 +7,7 @@ import Navigation from "@/components/Navigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
-import { useBannerAd, useAdMobDebug, useAdMobAvailable } from "@/hooks/useAdMob";
+import { useAdMobDebug, useAdMobAvailable } from "@/hooks/useAdMob";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -16,8 +16,7 @@ const Settings = () => {
   const [soundFeedback, setSoundFeedback] = useState(true);
   const [showAdDebug, setShowAdDebug] = useState(false);
   
-  // AdMob integration
-  useBannerAd(true, 'bottom');
+  // AdMob banner handled globally
   const adAvailable = useAdMobAvailable();
   const { stats, refreshStats, testBanner, testInterstitial, testRewarded } = useAdMobDebug();
 

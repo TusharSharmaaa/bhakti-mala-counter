@@ -174,7 +174,7 @@ class AdMobService {
         adId: AD_UNITS.banner,
         adSize: BannerAdSize.ADAPTIVE_BANNER,
         position: position === 'bottom' ? BannerAdPosition.BOTTOM_CENTER : BannerAdPosition.TOP_CENTER,
-        margin: 64,
+        margin: 0,
       };
 
       await AdMob.showBanner(options);
@@ -182,20 +182,10 @@ class AdMobService {
       try { document.body.classList.add('has-banner-ad'); } catch {}
       console.log('Banner ad shown (production)');
     } catch (error) {
-      console.warn('Prod banner failed, retrying with TEST unit:', error);
-      try {
-        await AdMob.showBanner({
-          adId: TEST_AD_UNITS.banner,
-          adSize: BannerAdSize.ADAPTIVE_BANNER,
-          position: position === 'bottom' ? BannerAdPosition.BOTTOM_CENTER : BannerAdPosition.TOP_CENTER,
-          margin: 0,
-        });
-        this.bannerVisible = true;
-        try { document.body.classList.add('has-banner-ad'); } catch {}
-        console.log('Banner ad shown (TEST)');
-      } catch (e) {
-        console.error('Failed to show banner (both prod and test):', e);
-      }
+      // Do NOT fallback to test units in production flows
+      this.bannerVisible = false;
+      try { document.body.classList.remove('has-banner-ad'); } catch {}
+      console.error('Failed to show production banner:', error);
     }
   }
 

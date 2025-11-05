@@ -10,14 +10,12 @@ import maharajImage from "/images/Gemini_Generated_Image_hlmn5lhlmn5lhlmn.png";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import axios from "axios";
-import { useBannerAd } from "@/hooks/useAdMob";
+
 
 const SpiritualContent = () => {
   const [showHindi, setShowHindi] = useState(true);
   
-  // AdMob integration - show banner at bottom
-  useBannerAd(true, 'bottom');
-  
+  // AdMob banner handled globally
   // Ensure page opens at top
   useEffect(() => { try { window.scrollTo({ top: 0, behavior: 'auto' }); } catch {} }, []);
 
