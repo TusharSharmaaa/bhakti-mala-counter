@@ -210,6 +210,9 @@ button:not(.unstyled) {
   }
   
   /* Move nav above system-anchored banner */
+  body.has-banner-ad {
+    padding-bottom: 60px; /* Ensure content stays above banner */
+  }
   body.has-banner-ad .app-bottom-nav {
     bottom: 60px;
   }

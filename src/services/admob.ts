@@ -170,6 +170,7 @@ class AdMobService {
     if (!AD_CONFIG.enabled || this.bannerVisible) return;
 
     try {
+      console.log('[AdMob] Requesting banner with adId:', AD_UNITS.banner);
       const options: BannerAdOptions = {
         adId: AD_UNITS.banner,
         adSize: BannerAdSize.ADAPTIVE_BANNER,
