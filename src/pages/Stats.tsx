@@ -132,12 +132,12 @@ const Stats = () => {
         <div className="grid grid-cols-2 gap-4">
           <Card className="shadow-soft border-border/50">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Malas</CardTitle>
-              <Calendar className="h-4 w-4 text-primary" />
+              <CardTitle className="text-sm font-medium truncate">Total Malas</CardTitle>
+              <Calendar className="h-4 w-4 text-primary flex-shrink-0" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{streakData?.total_malas || totalMalas}</div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <div className="text-3xl font-bold truncate">{streakData?.total_malas || totalMalas}</div>
+              <p className="text-xs text-muted-foreground mt-1 truncate">
                 {counter.count.toLocaleString()} total Jap
               </p>
             </CardContent>
@@ -145,14 +145,14 @@ const Stats = () => {
 
           <Card className="shadow-soft border-border/50">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Dedication</CardTitle>
-              <Award className="h-4 w-4 text-primary" />
+              <CardTitle className="text-sm font-medium truncate">Dedication</CardTitle>
+              <Award className="h-4 w-4 text-primary flex-shrink-0" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-primary">
                 {getStreakEmoji(streakData?.current_streak || 0)}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-xs text-muted-foreground mt-1 break-words">
                 {getDailyDedicationQuote()}
               </p>
             </CardContent>

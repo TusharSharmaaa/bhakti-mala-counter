@@ -260,9 +260,9 @@ const Settings = () => {
               <Button variant="outline" onClick={() => navigate('/privacy-policy')}>Privacy Policy</Button>
               <Button variant="outline" onClick={() => navigate('/terms')}>Terms & Conditions</Button>
               <div className="p-4 rounded-lg border border-border/60 bg-background/50 text-center">
-                <div className="mb-2 font-medium">Rate on Play Store — Radha Jap Counter</div>
-                <p className="text-sm text-muted-foreground mb-3">"आपका एक आशीर्वाद — हमारी साधना को आगे बढ़ाता है।"</p>
-                <Button variant="outline" onClick={() => window.open('https://play.google.com/store/apps/details?id=com.tusharsharmaaa.radha','_blank')}>Rate on Play Store</Button>
+                <div className="mb-2 font-medium break-words px-2">Rate on Play Store — Radha Jap Counter</div>
+                <p className="text-sm text-muted-foreground mb-3 break-words px-2">"आपका एक आशीर्वाद — हमारी साधना को आगे बढ़ाता है।"</p>
+                <Button variant="outline" className="w-full max-w-xs" onClick={() => window.open('https://play.google.com/store/apps/details?id=com.tusharsharmaaa.radha','_blank')}>Rate on Play Store</Button>
               </div>
               <Button onClick={() => {
                 if ((navigator as any).share) {
