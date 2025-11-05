@@ -1,4 +1,4 @@
-import { AdMob, BannerAdOptions, BannerAdSize, BannerAdPosition, InterstitialAdPluginEvents, RewardAdPluginEvents, AdMobRewardItem } from '@capacitor-community/admob';
+import { AdMob, BannerAdOptions, BannerAdSize, BannerAdPosition, InterstitialAdPluginEvents, RewardAdPluginEvents, AdMobRewardItem, BannerAdPluginEvents, AdMobError } from '@capacitor-community/admob';
 
 // Production Ad Unit IDs
 export const AD_UNITS = {
@@ -167,7 +167,7 @@ class AdMobService {
 
   // Banner Ads
   async showBanner(position: 'top' | 'bottom' = 'bottom') {
-    if (!AD_CONFIG.enabled || this.bannerVisible) return;
+    if (!AD_CONFIG.enabled) return;
 
     const baseOptions = (adId: string): BannerAdOptions => ({
       adId,
@@ -176,24 +176,66 @@ class AdMobService {
       margin: 0,
     });
 
+    // If a banner is already visible, remove it before showing a new one
+    if (this.bannerVisible) {
+      try { await AdMob.removeBanner(); } catch {}
+      this.bannerVisible = false;
+      try { document.body.classList.remove('has-banner-ad'); } catch {}
+    }
+
+    let attemptedTest = false;
+    let loadedListener: any;
+    let failedListener: any;
+
+    const cleanupListeners = () => {
+      try { loadedListener?.remove?.(); } catch {}
+      try { failedListener?.remove?.(); } catch {}
+    };
+
+    // Listen for load success/failure and toggle CSS + fallback accordingly
     try {
-      console.log('[AdMob] Requesting banner (PROD) with adId:', AD_UNITS.banner);
-      await AdMob.showBanner(baseOptions(AD_UNITS.banner));
-      this.bannerVisible = true;
-      try { document.body.classList.add('has-banner-ad'); } catch {}
-      console.log('Banner ad shown (production)');
-    } catch (error) {
-      // Fallback to Google TEST unit so you can always verify in development/new accounts
-      console.warn('Failed to show production banner, retrying with TEST unit:', error);
-      try {
-        await AdMob.showBanner(baseOptions(TEST_AD_UNITS.banner));
+      loadedListener = await AdMob.addListener(BannerAdPluginEvents.Loaded, () => {
         this.bannerVisible = true;
         try { document.body.classList.add('has-banner-ad'); } catch {}
-        console.log('Banner ad shown (TEST)');
-      } catch (e) {
+        console.log('[AdMob] Banner loaded');
+        cleanupListeners();
+      });
+
+      failedListener = await AdMob.addListener(BannerAdPluginEvents.FailedToLoad, async (err: AdMobError) => {
+        console.warn('[AdMob] Banner failed to load', err);
+        if (!attemptedTest) {
+          // Try Google TEST unit once
+          attemptedTest = true;
+          try {
+            await AdMob.removeBanner().catch(() => {});
+            console.log('[AdMob] Retrying banner with TEST unit');
+            await AdMob.showBanner(baseOptions(TEST_AD_UNITS.banner));
+            // Keep listeners so we capture loaded/failed for the TEST request too
+            return;
+          } catch (e) {
+            console.error('[AdMob] Failed to start TEST banner retry', e);
+          }
+        }
+        // Final failure
         this.bannerVisible = false;
         try { document.body.classList.remove('has-banner-ad'); } catch {}
-        console.error('Failed to show banner after TEST retry:', e);
+        cleanupListeners();
+      });
+
+      // Start with PRODUCTION ad unit
+      console.log('[AdMob] Requesting banner (PROD) with adId:', AD_UNITS.banner);
+      await AdMob.showBanner(baseOptions(AD_UNITS.banner));
+      // Do not set bannerVisible here; wait for Loaded event
+    } catch (error) {
+      console.warn('[AdMob] Error while requesting banner. Attempting TEST fallback immediately:', error);
+      try {
+        await AdMob.showBanner(baseOptions(TEST_AD_UNITS.banner));
+        // Loaded/Failed listeners will handle the result
+      } catch (e) {
+        console.error('[AdMob] Failed to show banner after immediate TEST retry:', e);
+        this.bannerVisible = false;
+        try { document.body.classList.remove('has-banner-ad'); } catch {}
+        cleanupListeners();
       }
     }
   }
