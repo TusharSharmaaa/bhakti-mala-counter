@@ -219,16 +219,16 @@ button:not(.unstyled) {
   
   /* Adjust bottom navigation when banner ad is visible */
   body.has-banner-ad {
-    padding-bottom: 64px;
+    padding-bottom: 100px; /* lift content more to avoid overlap on tall adaptive banners */
   }
   
   body.has-banner-ad .app-bottom-nav {
-    bottom: 64px;
+    bottom: 100px; /* keep nav above banner on devices with taller banner height */
   }
   
   @supports (padding: max(0px)) {
     body.has-banner-ad .app-bottom-nav {
-      bottom: max(64px, env(safe-area-inset-bottom));
+      bottom: max(100px, env(safe-area-inset-bottom));
     }
   }
   

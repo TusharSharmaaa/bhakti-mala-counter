@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Settings as SettingsIcon, Bell, Moon, Sun, Volume2, Info, Smartphone } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Moon, Sun, Info, Smartphone } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -13,7 +13,7 @@ const Settings = () => {
   const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(false);
-  const [soundFeedback, setSoundFeedback] = useState(true);
+  // Removed sound feedback control per spec
   const [showAdDebug, setShowAdDebug] = useState(false);
   
   // AdMob banner handled globally
@@ -26,10 +26,8 @@ const Settings = () => {
   useEffect(() => {
     const savedTheme = localStorage.getItem('app_theme');
     const savedNoti = localStorage.getItem('app_notifications');
-    const savedSound = localStorage.getItem('app_sound_feedback');
     if (savedTheme) setDarkMode(savedTheme === 'dark');
     if (savedNoti) setNotifications(JSON.parse(savedNoti));
-    if (savedSound) setSoundFeedback(JSON.parse(savedSound));
     if ((savedTheme || '') === 'dark') {
       document.documentElement.classList.add('dark');
     }
@@ -38,7 +36,6 @@ const Settings = () => {
   const saveSettings = async () => {
     localStorage.setItem('app_theme', darkMode ? 'dark' : 'light');
     localStorage.setItem('app_notifications', JSON.stringify(notifications));
-    localStorage.setItem('app_sound_feedback', JSON.stringify(soundFeedback));
     try { document.querySelector('meta[name="theme-color"]')?.setAttribute('content', darkMode ? '#0d0d0d' : '#ffffff'); } catch {}
     toast.success("Settings saved!", { position: "bottom-center", closeButton: true });
   };
@@ -152,42 +149,7 @@ const Settings = () => {
           </CardContent>
         </Card>
 
-        {/* Audio */}
-        <Card className="shadow-soft border-border/50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                <Volume2 className="h-4 w-4 text-primary" />
-              </div>
-              Audio
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label className="text-base">Sound Feedback</Label>
-              <button
-                onClick={() => setSoundFeedback(!soundFeedback)}
-                className={cn(
-                  "w-12 h-12 rounded-full flex items-center justify-center transition-colors",
-                  soundFeedback ? "bg-primary text-primary-foreground" : "bg-muted"
-                )}
-                aria-label="Toggle sound feedback"
-              >
-                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
-                  {soundFeedback && (
-                    <path
-                      d="M9 12l2 2 4-4"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  )}
-                </svg>
-              </button>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Audio controls removed */}
 
         {/* Ad Debug Panel (Developer Mode) - Hidden in production */}
         {isDev && (

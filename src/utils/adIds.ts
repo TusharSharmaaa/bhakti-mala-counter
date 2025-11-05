@@ -1,0 +1,10 @@
+// Centralized LIVE AdMob unit IDs
+export const AD_IDS = {
+  APP_OPEN: '',
+  BANNER: 'ca-app-pub-2816806517862101/8728062518',
+  INTER: 'ca-app-pub-2816806517862101/2144781799',
+  NATIVE: 'ca-app-pub-2816806517862101/3747855119',
+  REWARDED: 'ca-app-pub-2816806517862101/1671699576',
+} as const;
+
+
