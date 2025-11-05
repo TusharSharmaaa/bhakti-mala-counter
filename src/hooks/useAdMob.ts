@@ -6,28 +6,26 @@ import { ADS_ENABLED } from '@/config/ads';
 
 // Hook for banner ads
 export function useBannerAd(enabled: boolean, position: 'top' | 'bottom' = 'bottom') {
-  const mountedRef = useRef(false);
-  
   useEffect(() => {
-    if (mountedRef.current) return;
-    mountedRef.current = true;
-    
     let cleanup: (() => void) | undefined;
-    
+
     (async () => {
-      if (!enabled || !ADS_ENABLED) return;
-      
       try {
         const { getAdMobService } = await import('@/services/admob');
         const service = getAdMobService();
-        
         await service.initialize();
-        await service.showBanner(position);
-        
-        cleanup = () => {
-          service.hideBanner().catch(() => {});
-        };
-      } catch (error) {
+
+        if (!ADS_ENABLED) return;
+
+        if (enabled) {
+          await service.showBanner(position);
+          cleanup = () => {
+            service.hideBanner().catch(() => {});
+          };
+        } else {
+          await service.hideBanner();
+        }
+      } catch {
         // AdMob not available (web preview), silently ignore
       }
     })();
@@ -37,6 +35,7 @@ export function useBannerAd(enabled: boolean, position: 'top' | 'bottom' = 'bott
     };
   }, [enabled, position]);
 }
+
 
 // Hook for interstitial ads with smart frequency management
 export function useInterstitialAd() {

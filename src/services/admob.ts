@@ -169,24 +169,32 @@ class AdMobService {
   async showBanner(position: 'top' | 'bottom' = 'bottom') {
     if (!AD_CONFIG.enabled || this.bannerVisible) return;
 
-    try {
-      console.log('[AdMob] Requesting banner with adId:', AD_UNITS.banner);
-      const options: BannerAdOptions = {
-        adId: AD_UNITS.banner,
-        adSize: BannerAdSize.ADAPTIVE_BANNER,
-        position: position === 'bottom' ? BannerAdPosition.BOTTOM_CENTER : BannerAdPosition.TOP_CENTER,
-        margin: 0,
-      };
+    const baseOptions = (adId: string): BannerAdOptions => ({
+      adId,
+      adSize: BannerAdSize.ADAPTIVE_BANNER,
+      position: position === 'bottom' ? BannerAdPosition.BOTTOM_CENTER : BannerAdPosition.TOP_CENTER,
+      margin: 0,
+    });
 
-      await AdMob.showBanner(options);
+    try {
+      console.log('[AdMob] Requesting banner (PROD) with adId:', AD_UNITS.banner);
+      await AdMob.showBanner(baseOptions(AD_UNITS.banner));
       this.bannerVisible = true;
       try { document.body.classList.add('has-banner-ad'); } catch {}
       console.log('Banner ad shown (production)');
     } catch (error) {
-      // Do NOT fallback to test units in production flows
-      this.bannerVisible = false;
-      try { document.body.classList.remove('has-banner-ad'); } catch {}
-      console.error('Failed to show production banner:', error);
+      // Fallback to Google TEST unit so you can always verify in development/new accounts
+      console.warn('Failed to show production banner, retrying with TEST unit:', error);
+      try {
+        await AdMob.showBanner(baseOptions(TEST_AD_UNITS.banner));
+        this.bannerVisible = true;
+        try { document.body.classList.add('has-banner-ad'); } catch {}
+        console.log('Banner ad shown (TEST)');
+      } catch (e) {
+        this.bannerVisible = false;
+        try { document.body.classList.remove('has-banner-ad'); } catch {}
+        console.error('Failed to show banner after TEST retry:', e);
+      }
     }
   }
 
