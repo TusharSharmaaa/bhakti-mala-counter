@@ -11,9 +11,10 @@ interface ShareStreakButtonProps {
   longestStreak: number;
   totalMalas: number;
   onShareComplete?: () => void;
+  showRewardedAd?: () => Promise<{ completed: boolean }>;
 }
 
-const ShareStreakButton = ({ currentStreak, longestStreak, totalMalas, onShareComplete }: ShareStreakButtonProps) => {
+const ShareStreakButton = ({ currentStreak, longestStreak, totalMalas, onShareComplete, showRewardedAd }: ShareStreakButtonProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string>("");
   const [showImageModal, setShowImageModal] = useState(false);
@@ -30,11 +31,14 @@ const ShareStreakButton = ({ currentStreak, longestStreak, totalMalas, onShareCo
   };
 
   const generateImage = async () => {
-    // Show a rewarded ad first. Proceed whether completed or skipped.
+    // Show a rewarded ad first (non-blocking). Prefer external prop if provided; fallback to hook.
     try {
-      await showForShareReward();
+      if (showRewardedAd) {
+        await showRewardedAd();
+      } else {
+        await showForShareReward();
+      }
     } catch {}
-
     setIsGenerating(true);
     
     try {

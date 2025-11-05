@@ -19,6 +19,9 @@ const Settings = () => {
   // AdMob banner handled globally
   const adAvailable = useAdMobAvailable();
   const { stats, refreshStats, testBanner, testInterstitial, testRewarded } = useAdMobDebug();
+  
+  // Only show debug UI in development
+  const isDev = import.meta.env.DEV;
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('app_theme');
@@ -186,17 +189,18 @@ const Settings = () => {
           </CardContent>
         </Card>
 
-        {/* Ad Debug Panel (Developer Mode) */}
-        <Card className="shadow-soft border-border/50 bg-primary/5">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 cursor-pointer" onClick={() => setShowAdDebug(!showAdDebug)}>
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                <Smartphone className="h-4 w-4 text-primary" />
-              </div>
-              Ad Status (Tap to Toggle)
-            </CardTitle>
-          </CardHeader>
-          {showAdDebug && (
+        {/* Ad Debug Panel (Developer Mode) - Hidden in production */}
+        {isDev && (
+          <Card className="shadow-soft border-border/50 bg-primary/5">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 cursor-pointer" onClick={() => setShowAdDebug(!showAdDebug)}>
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Smartphone className="h-4 w-4 text-primary" />
+                </div>
+                Ad Status (Tap to Toggle) - DEV ONLY
+              </CardTitle>
+            </CardHeader>
+            {showAdDebug && (
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <div className="flex items-center justify-between p-2 rounded bg-background/50">
@@ -242,8 +246,9 @@ const Settings = () => {
                 This panel helps debug ads on native builds. Web preview will always show "NO".
               </p>
             </CardContent>
-          )}
-        </Card>
+            )}
+          </Card>
+        )}
 
         {/* About */}
         <Card className="shadow-soft border-border/50">

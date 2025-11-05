@@ -6,7 +6,7 @@ import { Play, Pause, RotateCcw, Volume2, VolumeX } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { toast } from "sonner";
 import { MeditationAudioEngine, SoundType } from "@/lib/meditationAudio";
-// No AdMob imports - meditation page is ad-free
+import { useInterstitialAd } from "@/hooks/useAdMob";
 
 const MeditationTimer = () => {
   // Ensure page opens at top
@@ -20,8 +20,9 @@ const MeditationTimer = () => {
   const intervalRef = useRef<number>();
   const audioEngineRef = useRef<MeditationAudioEngine | null>(null);
   const sessionStartTime = useRef<number>(0);
+  const { showAfterTimerSession } = useInterstitialAd();
   
-  // No ads on meditation page - peaceful environment
+  // Show interstitial only after session completion (>= 10 min)
 
   // Initialize audio engine
   useEffect(() => {
@@ -116,6 +117,11 @@ const MeditationTimer = () => {
     setIsRunning(false);
     stopBackgroundSound();
     
+    // Calculate session duration
+    const sessionDuration = sessionStartTime.current > 0 
+      ? Date.now() - sessionStartTime.current 
+      : duration * 60 * 1000;
+    
     toast.success("🧘 Meditation Complete!", {
       description: "Radhe Radhe! Your meditation session is complete.",
       duration: 5000,
@@ -141,16 +147,12 @@ const MeditationTimer = () => {
     if (navigator.vibrate) {
       navigator.vibrate([200, 100, 200, 100, 200]);
     }
-
-    // Show an interstitial after completion screen appears (non-blocking)
+    // Show interstitial ad after session completion (only if >= 10 min). Skip silently if unavailable
     try {
-      const { getAdMobService, PLACEMENTS } = await import("@/services/admob");
-      const service = getAdMobService();
-      await service.initialize();
-      setTimeout(() => {
-        service.showInterstitial(PLACEMENTS.INT_TIMER_POST_SESSION).catch(() => {});
-      }, 300);
-    } catch {}
+      await showAfterTimerSession(sessionDuration);
+    } catch (error) {
+      console.warn('Interstitial ad not available after meditation session:', error);
+    }
   };
 
   const playCompletionSound = () => {

@@ -12,7 +12,7 @@ const Home = () => {
   // Keep screen awake during japa
   useWakeLock(true);
   
-  // AdMob integration now handled globally
+  // AdMob integration handled via page layout; no direct hook here
   const handleCount = () => {
     increment();
   };
@@ -22,7 +22,10 @@ const Home = () => {
       description: `Radhe Radhe! ${malas + 1} mala${malas + 1 > 1 ? 's' : ''} completed with devotion.`,
       duration: 3000,
     });
+<<<<<<< HEAD
     
+=======
+>>>>>>> aa83e6c (New branch created and pushed)
   };
 
   const handleReset = () => {
@@ -106,8 +109,8 @@ const Home = () => {
             <div className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2 rounded-full bg-secondary/10 flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
                <img src="/images/Gemini_Generated_Image_8e5j1n8e5j1n8e5j.png" alt="Mala" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
             </div>
-            <p className="text-xs text-muted-foreground mb-1 whitespace-nowrap">Lifetime Mala's</p>
-            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-secondary">{Math.floor(counter.count / 108)}</p>
+            <p className="text-xs text-muted-foreground mb-1 whitespace-nowrap overflow-hidden text-ellipsis">Lifetime Malas</p>
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-secondary whitespace-nowrap overflow-hidden text-ellipsis">{Math.floor(counter.count / 108)}</p>
           </div>
         </div>
 
@@ -120,17 +123,7 @@ const Home = () => {
           />
         </div>
 
-        {/* Footer Quote */}
-        <div className="text-center mb-16 sm:mb-20 pt-2 px-4">
-          <div className="inline-block px-5 py-3 rounded-xl border backdrop-blur" style={{
-            backgroundColor: 'rgba(255,255,255,0.75)',
-            borderColor: 'rgba(0,0,0,0.08)'
-          }}>
-            <p className="italic text-base sm:text-lg font-semibold" style={{ color: '#37306B' }}>
-              "हर माला एक मौन प्रार्थना है।"
-            </p>
-          </div>
-        </div>
+        {/* Footer quote removed */}
       </main>
 
 

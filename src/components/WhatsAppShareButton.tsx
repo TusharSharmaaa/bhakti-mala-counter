@@ -14,28 +14,7 @@ interface WhatsAppShareButtonProps {
 const WhatsAppShareButton = ({ content, title = "Spiritual Content", onShareComplete, className = "", adMode = 'interstitial' }: WhatsAppShareButtonProps) => {
   const handleWhatsAppShare = async () => {
     try {
-      // FIRST: Show ad (if enabled)
-      let adShown = false;
-      if (adMode !== 'none') {
-        try {
-          const mod: any = await import("@/services/admob");
-          const getService = mod.getAdMobService || mod.default?.getAdMobService;
-          const placements = mod.PLACEMENTS;
-          if (getService && placements) {
-            const service = getService();
-            try { await service.initialize(); } catch {}
-            // Wait for ad to show and complete
-            await service.showInterstitial(placements.INT_CONTENT_EXIT || "share_whatsapp");
-            adShown = true;
-            // Give user a moment after ad closes
-            await new Promise(resolve => setTimeout(resolve, 500));
-          }
-        } catch (_) {
-          // Ad service not available in web preview; ignore
-        }
-      }
-      
-      // THEN: Create WhatsApp share URL with Play Store link
+      // Create WhatsApp share URL with Play Store link (no interstitial here)
       const playLink = 'https://play.google.com/store/apps/details?id=com.tusharsharmaaa.radha';
       const shareText = `${title}\n\n${content}\n\n📱 Download Radha Jap Counter:\n${playLink}\n\nShared via Radha Jap Counter App`;
       const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;

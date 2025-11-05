@@ -10,23 +10,17 @@ export function useBannerAd(enabled: boolean, position: 'top' | 'bottom' = 'bott
     let cleanup: (() => void) | undefined;
 
     (async () => {
+      if (!enabled || !ADS_ENABLED) return;
       try {
         const { getAdMobService } = await import('@/services/admob');
         const service = getAdMobService();
         await service.initialize();
-
-        if (!ADS_ENABLED) return;
-
-        if (enabled) {
-          await service.showBanner(position);
-          cleanup = () => {
-            service.hideBanner().catch(() => {});
-          };
-        } else {
-          await service.hideBanner();
-        }
+        await service.showBanner(position);
+        cleanup = () => {
+          service.hideBanner().catch(() => {});
+        };
       } catch {
-        // AdMob not available (web preview), silently ignore
+        // AdMob not available (web preview)
       }
     })();
 
@@ -39,34 +33,27 @@ export function useBannerAd(enabled: boolean, position: 'top' | 'bottom' = 'bott
 
 // Hook for interstitial ads with smart frequency management
 export function useInterstitialAd() {
-  const showAfterMalaCompletion = async (currentCount: number) => {
-    const malasCompleted = Math.floor(currentCount / 108);
-    if (malasCompleted % 3 !== 0) return false;
-
-    try {
-      const { getAdMobService, PLACEMENTS } = await import('@/services/admob');
-      const service = getAdMobService();
-      await service.initialize();
-      return await service.showInterstitial(PLACEMENTS.INT_AFTER_3_MALAS);
-    } catch {
-      return false;
-    }
-  };
-
-  const showAfterTimerSession = async (durationMinutes: number) => {
+  const showAfterTimerSession = async (durationMs: number) => {
+    const durationMinutes = durationMs / (1000 * 60);
     if (durationMinutes < 10) return false;
 
     try {
-      const { getAdMobService, PLACEMENTS } = await import('@/services/admob');
+      const { getAdMobService, PLACEMENTS, frequencyManager } = await import('@/services/admob');
       const service = getAdMobService();
       await service.initialize();
+      
+      // Check frequency manager before showing
+      if (!frequencyManager.canShowInterstitial()) {
+        return false;
+      }
+      
       return await service.showInterstitial(PLACEMENTS.INT_TIMER_POST_SESSION);
     } catch {
       return false;
     }
   };
 
-  return { showAfterMalaCompletion, showAfterTimerSession };
+  return { showAfterTimerSession };
 }
 
 // Hook for rewarded ads
@@ -90,16 +77,16 @@ export function useRewardedAd() {
     })();
   }, []);
 
-  const showForShareReward = async (): Promise<boolean> => {
+  const showForShareReward = async (): Promise<{ completed: boolean }> => {
     setIsLoading(true);
     try {
       const { getAdMobService, PLACEMENTS } = await import('@/services/admob');
       const service = getAdMobService();
       await service.initialize();
       const result = await service.showRewarded(PLACEMENTS.REW_SHARE_STATS_CARD);
-      return result.watched;
+      return result;
     } catch {
-      return false;
+      return { completed: false };
     } finally {
       setIsLoading(false);
     }
@@ -182,7 +169,7 @@ export function useAdMobDebug() {
       const service = getAdMobService();
       await service.initialize();
       const result = await service.showRewarded('test_manual_rewarded');
-      return result.watched;
+      return result.completed;
     } catch (error) {
       console.error('Test rewarded failed:', error);
       return false;

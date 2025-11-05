@@ -8,13 +8,14 @@ import { StreakData } from "@/lib/streak";
 import { getStreakStatusMessage, getStreakEmoji } from "@/lib/streak";
 import ShareStreakButton from "@/components/ShareStreakButton";
 import ProgressCalendar from "@/components/ProgressCalendar";
-
+import { useRewardedAd } from "@/hooks/useAdMob";
 
 const Stats = () => {
   const { counter, loading } = useCounter();
   const [streakData, setStreakData] = useState<StreakData | null>(null);
   const [streakLoading, setStreakLoading] = useState(true);
   
+  const { showForShareReward } = useRewardedAd();
 
   useEffect(() => {
     loadStreakDataFromDB();
@@ -122,6 +123,8 @@ const Stats = () => {
                   currentStreak={streakData?.current_streak || 0}
                   longestStreak={streakData?.longest_streak || 0}
                   totalMalas={streakData?.total_malas || totalMalas}
+                  showRewardedAd={showForShareReward}
+                   showRewardedAd={showForShareReward}
                 />
               </div>
             </div>

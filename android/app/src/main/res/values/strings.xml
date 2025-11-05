@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Radha Jap Counter</string>
+    <string name="title_activity_main">Radha Jap Counter</string>
+    <string name="package_name">com.tusharsharmaaa.radha</string>
+    <string name="custom_url_scheme">com.tusharsharmaaa.radha</string>
+</resources>

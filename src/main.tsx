@@ -27,6 +27,39 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+// Consent handling (non-blocking, EEA-safe)
+(async () => {
+  try {
+    const { AdMob, ConsentStatus } = await import('@capacitor-community/admob');
+    // Try to request consent info update
+    try {
+      await AdMob.requestConsentInfoUpdate();
+      // Check consent status before showing form
+      const status = await AdMob.getConsentStatus?.();
+      if (status && status.status === ConsentStatus.REQUIRED) {
+        await AdMob.showConsentForm();
+      }
+    } catch (e: any) {
+      // Consent API not available or not required, continue anyway
+      console.log('[AdMob] Consent not required/available', e?.message || e);
+    }
+  } catch (e: any) {
+    // AdMob not available (web preview), ignore
+    console.log('[AdMob] Consent handling skipped (web preview)', e?.message || e);
+  }
+})();
+
+// Initialize AdMob once at app start (non-blocking)
+(async () => {
+  try {
+    const { getAdMobService } = await import('@/services/admob');
+    const service = getAdMobService();
+    await service.initialize();
+  } catch (e) {
+    // Likely web preview; ignore
+  }
+})();
+
 createRoot(document.getElementById("root")!).render(
   <ErrorBoundary>
     <App />
