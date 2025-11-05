@@ -14,10 +14,13 @@ import { ADS_ENABLED } from "./config/ads";
     await service.initialize();
     console.log('AdMob initialized on app startup');
   } catch (error) {
-    // AdMob not available (web preview), silently ignore
-    console.log('AdMob not available in this environment');
+    // AdMob not available or failed - don't crash the app
+    console.error('AdMob initialization failed:', error);
   }
-})();
+})().catch((err) => {
+  // Catch any unhandled errors to prevent app crashes
+  console.error('Critical error during AdMob setup:', err);
+});
 
 // Register service worker for PWA
 if ('serviceWorker' in navigator) {
